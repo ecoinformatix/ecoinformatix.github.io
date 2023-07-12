@@ -1,0 +1,188 @@
+---
+title: "Writing reproducible code"
+author: "Tad Dallas"
+includes:
+  in_header:
+    - \usepackage{lmodern}
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    highlight: tango
+    theme: journal
+---
+
+
+
+
+
+### What do we mean by 'reproducible'?
+
+
+**Reproducibility** is obtaining consistent results using the same input data; computational steps, methods, and code; and conditions of analysis. This definition is synonymous with “computational reproducibility,” and the terms are used interchangeably in this report.
+
+
+
+**Replicability** is obtaining consistent results across studies aimed at answering the same scientific question, each of which has obtained its own data.
+
+
+
+
+
+
+
+
+### What are some bad things that can happen when we fail to focus on reproducibility?
+
+Science is evidence-based by definition, and findings build on one another. Being able to reproduce the findings of other researchers is therefore nearly as important as contributing 'new' evidence. Researchers are fallable in their ability to write bug-free code, and by releasing code and data, these errors can be detected and corrected. Apart from this, reproducibiltiy and open-science sort of go hand-in-hand, in that code that is reproducible is also ideally open access, meaning that any researcher has the ability to take the code and data and reproduce the analyses. 
+
+
+
+
+
+
+
+
+
+
+### What are the major barriers to reproducibility? 
+
++ **Changes to libraries that are _breaking changes_**. This occurs when the people maintaining the code make changes to add a new feature etc., but do so in a way that breaks the functionality of old code based on their codebase. 
+
++ **Different operating systems**. The code and data could rely on few external libraries and still fail to run due to differences in installed backend libraries across different operating systems. For instance, to do spatial data analyses, many libraries outside of R need to be installed in order for the R packages to do spatial data analysis to be installed. 
+
++ **Link rot**. Even if the data and code can run, it does not mean that they will be accessible to everyone, as platforms for hosting code may change over time, resulting in some hyperlinks not properly redirecting to the necessary files. 
+
++ **Resistance to data and code sharing**. Data ownership and provenance are often listed as concerns among researchers who do not necessarily want to share their data and code. Recent NSF and NIH mandates start to force some researchers hands in terms of data and code sharing, but there will likely always be this feeling of ownership among some fraction of researchers. 
+
++ **The code itself is not reproducible**. Last one and perhaps the most obvious. Sharing code doesn't necessarily mean sharing good code, such that the actual code could not reproduce the analyses that the authors claim it does in their manuscript. This is actually not all that uncommon. Some authors code and data files that they share will only have summary data that we must trust is correct, and the code they supply is largely just for visualization. 
+
+
+
+
+
+
+
+
+
+### How can we improve reproducibility in our code? 
+
+There are a number of ways we can improve reproducibility in the code we write. 
+
+
++ **Setting seed**. Some code that you may write might have an element of randomness in it. For instance, if I wrote a paper in which I generate data from a stochastic model of population dynamics, the user may not be able to reproduce that exact same trajectory of events. If everyone typed in the following code into an R instance, how likely do you think it is that any two students will have matching entries? Maybe but not likely for `rbinom(10, 1, 0.25)`, and vanishingly unlikely for something like `runif(10,0,1)`. 'Setting the seed' refers to setting the parameter which controls the resulting probabilistic output. So now, if users entered in `set.seed(1234)` before running the code above, everyone should have the same string of 10 numbers. 
+
+
+```{r}
+set.seed(1234)
+rbinom(10, 1, 0.25)
+rbinom(10, 1, 0.25)
+rbinom(10, 1, 0.25)
+
+set.seed(123)
+rbinom(10, 1, 0.25)
+rbinom(10, 1, 0.25)
+
+```
+
+
+
++ **Documenting functions**. Sharing code is great, but often a lot of the burden of reading and interpreting the code is left to the user. By documenting functions -- and our code more generally -- some of this burden is removed, and can enhance code re-use, help identify potential errors earlier, and is just good practice. 
+
+Let's explore an example of this. I wrote a function that performs a "min-max standardization" on a given vector of data. This takes every entry of a vector and subtracts the minimum value, then divides by the maximum minus the minimum. The effect of this is that the data are now scaled between 0 and 1. Proper documentation following the format designed by the `roxygen2` package developers and incorporated into the workhorse library `devtools`, both of which are maintained by Wickham and folks at RStudio/posit. The nice part of this form of documentation is that the documentation and the function are in the same file. Long ago, the documentation of functions in for distribution as an R package would require the developer to edit a separate document with all the details of each function. 
+
+
+```{r}
+#' Min-max standardization
+#' 
+#' @param x a vector of numeric data
+#'
+#' @return the same vector x, but standardized between 0 and 1
+#' 
+#' @examples 
+#' getMinMax(x=1:10)
+
+getMinMax <- function(x){
+  (x-min(x)) / (max(x)-min(x))
+}
+
+```
+
+Here we include information on what the function does, what arguments it takes, what the output will be, and provide a use case. This is most important for package developers, but it is good practice to provide some documentation of your code. 
+
+
+
+
+
+
+
+
++ **Handling errors**. Writing code defensively is a great skill to practice. One of the most important ways to write defensively is to incorporate catches into the code that check for odd inputs and provide informative `warnings` and `errors`. 
+
+Let's take the example of the function we wrote above. It's well-documented, but let's say I want to give it a vector that contains an `NA` value? What is going to happen? 
+
+```{r}
+
+test <- c(1:10, NA)
+getMinMax(test)
+
+```
+
+That's not great. Ideally, it would keep the `NA` values where they are, but still standardize the vector. Maybe even provide the user a `warning` about `NA` values being present? Let's implement that now. 
+
+```{r}
+#' Min-max standardization
+#' 
+#' @param x a vector of numeric data
+#'
+#' @return the same vector x, but standardized between 0 and 1
+#' 
+#' @examples 
+#' getMinMax(x=1:10)
+
+getMinMax <- function(x){
+  if(any(is.na(x))){
+    warning('The vector x contains NA values. These will be ignored.')
+  }
+  (x-min(x, na.rm=TRUE)) / (max(x, na.rm=TRUE)-min(x, na.rm=TRUE))
+}
+
+```
+
+So now, we warn the user about the input data having the `NA` values and have programmed our function in a way to account for those `NA` values. What other ways should we think about modifying this function for clarity and usability? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
++ **`sessionInfo` at end of document**. Putting `sessionInfo` at the end the document will clearly list the R version, OS, and package versions that you are using. It's a couple steps short of full reproducibility, but it at least shows the user (if you compile the code to html or pdf) exactly what set of conditions allowed the code to run all the way through. 
+
+
+
+
+## sessionInfo 
+
+```{r}
+
+sessionInfo()
+
+```

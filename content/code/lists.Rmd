@@ -1,0 +1,366 @@
+---
+title: "Working with lists"
+author: Tad Dallas
+includes:
+  in_header:
+    - \usepackage{lmodern}
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    highlight: tango
+    theme: journal
+---
+
+
+
+
+
+
+### What are lists?
+
+Lists in R are collections of objects that can be of any mix of types (or all the same type). They can be useful when dealing with multiple data.frames that each correspond to a different unit of study (note that we solved this before by considering a single data.frame with a column corresponding to country). Lists tend to be useful in my research when I'm simulating ecological dynamics, where each list item can be the results of a single simulation, or when I'm writing functions to return data that is not really structured as a data.frame. Before we go too far into use cases, lets refresh on how we form and index list objects. 
+
+
+```{r}
+
+lst <- list(runif(100), data.frame(x=runif(100), y=runif(100)), letters[1:10], 'a')
+
+# index single list elements
+lst[[1]]
+lst[[2]]
+lst[[3]]
+lst[[4]]
+
+
+# index multiple list elements
+lst[1:2]
+
+
+```
+
+
+Let's think about how we might use lists. For one, many functions in R output data in list format. For instance, working with network data in R through `igraph`, most things are lists. Let's explore this, both as a way to introduce lists and to talk about how to analyze network data in R. 
+
+
+```{r}
+
+#install.packages('igraph')
+library(igraph)
+
+g <- igraph::sample_gnm(100, 200)
+
+str(g)
+
+```
+
+
+
+Recall when we introduced the `plot` function, and I said that packages build in functionality such that some base functions will work with more complex objects (the `igraph` object above is a list). Try it here. 
+
+```{r}
+
+plot(g)
+
+```
+
+Nice. That's neat. We can also write a wrapper function (we will not go over function writing now, but will save that for the coming weeks), which can be useful across multiple projects. This is a function I routinely use for visualizing networks in a prettier way. 
+
+```{r}
+
+#' @param g graph object
+#' @param colz
+#' @param nodeColor
+#' @param nodeSize
+#' 
+#' @return a graph plot
+
+plotGraph <- function(g, lay=layout_nicely(g), colz='dodgerblue'){
+	plot(g, layout=lay, edge.width= E(g)$weight, vertex.size=10, directed=FALSE,
+		vertex.color= colz, 
+    vertex.label=NA)
+}
+
+
+plotGraph(g)
+
+```
+
+
+But let's get back to lists. We've seen that `igraph` graph objects are lists, but also many of the outputs of functions within `igraph` are lists (or even lists of lists!). I will not defend nested lists as being all that useful, but we will see them in a couple of weeks when we talk about APIs and spatial data. 
+
+So one of the functions built into `igraph` is the `sir` function. This is a function which runs a model on the network known as the Susceptible-Infected-Recovered model (or SIR for short), which aims to capture how diseases spread through populations. 
+
+\begin{align}
+\frac{dS}{dt} & =  -\beta SI \\
+\frac{dI}{dt} & =  \beta SI - \gamma I \\
+\frac{dR}{dt} & =  \gamma I
+\end{align}
+
+
+The default behavior of the function (`?sir`) will run 100 simulations of the SIR model on a graph object that you provide to the function, and store the output as a list. 
+
+```{r}
+
+sims <- igraph::sir(g, beta=0.5, gamma=0.5, no.sim=100)
+typeof(sims)
+class(sims)
+
+# explore the structure of each list element 
+sims[[1]] 
+
+# each list element is another list
+sims[[1]][[1]]
+sims[[1]]$times 
+
+```
+
+
+
+And just to go back to plotting for a quick second, `igraph` has written functionality into the `sir` class to work well with the base R `plot` function. 
+
+```{r}
+plot(sims)
+```
+
+Neat, right? 
+
+
+But back to lists. Let's work through the rest of working with lists through some exercises. Given the simulations above (`sims` list) ...
+
+
+Calculate the mean number of infected individuals for each simulation
+
+```{r}
+
+
+```
+
+Find the time associated with the maximum number of infected nodes 
+
+```{r}
+
+
+
+```
+
+
+Calculate the fraction of all simulations in which fewer than 5 nodes are infected
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## apply statements 
+
+How did we approach the above questions? You almost certaintly used a `for` loop, right? This is perfectly fine, but there is another way. `apply` statements allow you to take a function and run it over all elements of a vector, columns/rows of a matrix, or a list. 
+
+`apply` statements typically have a prefix which gives information about what type of data it works well with. For instance, working with lists, we will use `lapply`. The base `apply` function is to work with matrices, where we want to apply a function to every row or column of a matrix (e.g., `apply(matrix, 2, sum)` is the same as `colSums(matrix)`). We will go over more examples of `apply` statements at some point, but for now we will focus on `lapply` and our problem of working with lists. 
+
+And here we hit an issue. `lapply` statements take a function argument, where the function needs to take the list object as an argument and then does something with it. So we'll have to learn a bare minimum of function writing now. Let's use a problem above as a motivating example, where we try to calculate the mean number of infected individuals for each simulation. 
+
+
+```{r}
+
+meanInfections <- function(x){
+  # if we consider the mean infecteds as the mean of the infected vector
+  return(mean(x$NI))
+  # if we consider the mean infecteds as the mean number of nodes infected 
+  # return((x$NS[1]+1)-tail(x$NS,1))
+}
+
+
+meanInfs <- lapply(sims, meanInfections)
+str(meanInfs)
+
+```
+
+`lapply` is nice in that if we give it a list object, it gives us a list object back. This makes analytical pipelines that deal with lists pretty straightforward, but if the output is a single value, we may want this to be a vector instead of a list. 
+
+```{r}
+
+unlist(meanInfs) 
+#or
+meanInfs2 <- sapply(sims, meanInfections)
+
+```
+
+`sapply` statements are essentially just `lapply` statements that simplify the result to a vector. This is useful when the output of the function is a single value, and not so useful when function returns multiple values. 
+
+
+
+
+
+_A side note_: some people will criticize `for` loops in R, and say "just use apply, it's faster". It's not, really. Write however you feel comfortable. For awhile, `apply` statements were super confusing to me, so I tended to use `for` loops instead. After more work in, I shifted and tend to use `apply` statements when it fits, as they are less code and are more intuitive to me for many situations. 
+
+
+
+### Let's practice a bit. 
+
+Calculate the maximum number of infected inviduals at any time in the `sims` list using the `apply` approach.  
+
+
+```{r}
+
+
+```
+
+
+
+
+What is the mean duration (the total time the epidemic took before it stopped) across all the epidemics in `sims`?
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+## plyr apply functionality tweaks 
+
+`XYply` statements as nice wrappers to more classic `apply` statements. Here, `X` and `Y` can take values of 'a', 'l', or 'd', depending on the input or output data structure desired. For instance, if we have a list that we would like to apply over and return a data.frame, we would use `ldply`, where the `l` is claiming that the input is a list object, and the `d` is claiming that the output should be formatted as a data.frame. Other examples of this syntax would be `adply`, `ddply`, `laply`, `aaply`, etc. etc.
+
+Below, I provide an example of the aXply syntax (e.g., adply, alply, aaply).
+
+```{r}
+
+arr <- array(1:27, c(3,3,3))
+rownames(arr) = c("Curly", "Larry", "Moe")
+colnames(arr) = c("Groucho", "Harpo", "Zeppo")
+dimnames(arr)[[3]] = c("Bart", "Lisa", "Maggie")
+
+arr
+
+```
+
+Arrays are something that we did not introduce when we talked about `R` basics, and that is because they really are not used _too_ often. Think of matrix. It has two dimensions (x and y), so it can be viewed as a rectangle of data. Arrays simply add more dimensions. In the example above, there is another dimension, forming a data cube (in the rectangle analogy). 
+
+
+We can use `plyr` functionality to operate on this array and return different forms. For instance, `aaply` takes an array and returns a simplified array (here a vector).
+
+
+```{r}
+
+plyr::aaply(arr, 1, sum) 
+
+```
+
+We can change one letter and now return a data.frame containing two columns. This is also a good time to point out the flexibility of the XYply statements to different margins. Margins (denoted as `.margins` argument in `R`, asks along which axis you would like to operate on the array. If we set .margins=1, this corresponds to a row-wise operation, so we calculate the sum across the array for Curly, Larry, and Moe. If we change this to .margins=2, we operate on columns, and will return sums for Groucho, Harpo, and Zeppo. And if we use .margins=3, we will return sums for Bart, Lisa, and Maggie. 
+
+
+```{r}
+
+plyr::adply(.data=arr, .margins=1, .fun=sum) 
+plyr::adply(.data=arr, .margins=2, .fun=sum) 
+plyr::adply(.data=arr, .margins=3, .fun=sum) 
+
+```
+
+
+
+Finally, we can return a list object. In this use case, this is not super helpful, but in other use cases the list output is pretty helpful. 
+
+```{r}
+
+plyr::alply(.data=arr, .margins=1, .fun=sum) 
+
+```
+
+
+
+
+A pitch for `plyr::ldply`. I really like this function, as I often find myself with lists of similar structures that I want to operate on and get a single clean object back. I will not go into an example, but this is a pretty useful function (though all the utility is basically contained in `vapply`). 
+
+
+
+Finally, you may wonder why am I pushing apply statements so hard. It has nothing to do with speed, and only a bit to do with code clarity. The main advantage is understanding the programmatic nature of apply statements (which will be similar but less chronological than a for loop), and many parallel computing packages have their own little versions of apply statements ready to go (e.g., `parallel::mclapply`, `parallel::parLapply`, `parallel::clusterApplyLB`).
+
+
+
+
+Let's do one practice problem to showcase the utility of `ldply` specifically. 
+
+
+Calculate the correlation between number of infections and time for each simulation, reporting the estimate, p-value, and confidence intervals around the estimate. (you will use `cor.test` to do this, whose output is a list object as well)
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+### A note about do.call and Reduce 
+
+While a bit opaque, these functions are pretty useful in a variety of situations. Speaking of data manipulation functions that are useful but a bit conceptually difficult, `do.call` and `Reduce` are solid base `R` functions. 
+
+`do.call` is a way of calling the same function recursively on multiple objects, and may have similar output to `Reduce`, which is also a way to recursively apply a function. 
+
+
+```{r}
+
+lst <- list(1:10, 1:10, 1:10, 1:10, 1:10)
+lst
+
+#this makes a single rbind call with each element of the list as an argument
+str(do.call(rbind, lst))
+
+#this does it iteratively (so makes n-1 rbind calls)
+Reduce(rbind, lst)
+
+```
+
+
+
+
+
+
+
+
+## sessionInfo 
+
+```{r}
+
+sessionInfo()
+
+```

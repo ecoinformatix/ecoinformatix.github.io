@@ -1,0 +1,523 @@
+---
+title: "Probabilistic processes"
+author: "Tad Dallas"
+includes:
+  in_header:
+    - \usepackage{lmodern}
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    highlight: tango
+    theme: journal
+---
+
+
+
+
+## What do I mean by "probabilistic processes"?
+
+We have already gone over a bit of probabilistic processes in a roundabout way. Throughout this course, we have generated random data from probability distributions. For instance, we pulled values from a uniform distribution, in which all values are equally probable of being drawn between two bounds (`runif(100, 1, 10)`). 
+
+Probabilistic processes are simply those processes whose outcome is determined by some probability (e.g., every time I flip a coin, I don't know the outcome, right?). We can code this up, right? Every trial of a coin flip results in 1 of 2 outcomes (i.e., heads or tails) with the probability we assume is 0.5 (both outcomes are equally likely). The probability distribution corresponding to this situation is the binomial distribution. 
+
+For instance, the following code would simulate flipping a coin 100 times. 
+```{r}
+
+coin <- rbinom(100, 1, p=0.5)
+sum(coin == 1)
+
+```
+
+As a biological example, consider an animal who disperses with some probability $p$, and moves a distance determined by a Poisson distribution with mean 10km. How do we code this up? 
+
+```{r}
+
+
+
+```
+
+
+This starts to explore how you might go about setting up a simulation model, but this is already getting spatial and going into things that are a bit more complicated, so let's dial it back. 
+
+
+
+But the above incorporation of probabilistic processes is based on phenomenological modeling, where many of us might also want to do some statistical modeling. We will essentially do both in this lecture, where we first go into probability distributions as they relate to gaining statistical insight from your data, and end with some simulation modeling to show how probabilistic processes influence population dynamics. 
+
+### notation in R
+“d” 	returns the height of the probability density function
+“p” 	returns the cumulative density function
+“q” 	returns the inverse cumulative density function (quantiles)
+“r” 	returns randomly generated numbers
+
+### Generate random draws from probability distributions
+
+```{r}
+
+rnorm(100, 1, 1)
+rbinom(100, 1, 0.25)
+rpois(100, 1)
+runif(100, 1, 20)
+rgamma(100, 1, 1)
+
+```
+
+
+
+Given a number or a list it computes the probability that a random number will be less than that number. 
+
+```{r}
+
+pnorm(-1, mean=0, sd=1)
+pnorm(1, mean=0, sd=1)
+pnorm(1, mean=0, sd=1, lower.tail=FALSE)
+
+
+pbinom(0, 1, 0.15)
+ppois(1, lambda=2)
+punif(0.25, 0, 1)
+
+
+```
+
+
+The next function we look at is `q----` which is the inverse of `p----`. The idea behind `q----` is that you give it a probability, and it returns the number whose cumulative distribution matches the probability. 
+
+```{r}
+
+pnorm(0.25, mean=0, sd=1)
+
+qnorm(0.25, mean=0, sd=1)
+pnorm(-0.6744898, mean=0, sd=1)
+
+
+par(mfrow=c(1,2))
+hist(rnorm(1000))
+abline(v=0.25, lwd=2)
+abline(v=-0.6744898, col='red', lwd=2)
+plot(ecdf(rnorm(1000)))
+abline(v=0.25, lwd=2)
+abline(v=-0.6744898, col='red', lwd=2)
+
+```
+
+The last is `d----`, which we will go ahead and ignore for now, as the `r---`, `p----`, and `q----` variants tend to be a bit more useful for thinking about statistical testing. 
+
+
+
+But how does the above relate to statistical tests? We will explore this by considering an example of the t-test, but think about other statistical tests that may (and likely do) follow a similar structure in terms of how the test statistic is calculated and how we think about p-values. 
+
+
+
+### A case study of the t-test
+
+
+The t-test can be used to test for differences between two groups of data, or of one group of data and some mean $\mu$. It is a comparison of means, so we implicitly assume no differences in variance or distributional shape between the two groups. 
+
+
+### One sample
+
+\[ \dfrac{X - \mu}{sd(X) / \sqrt(n)} \]
+
+This tests if the population mean is different from some value that you provide. In the example below, we generate random data from a normal distribution with mean 1 and variance 2. We want to know if the population mean of the random data are significantly different from a value of 2 ($\mu$ = 2). 
+
+
+```{r}
+x <- rnorm(100, 1, 2)
+mu <- 2
+
+hist(x)
+abline(v=mu, col='dodgerblue', lwd=2)
+
+t.test(x, mu=mu)
+
+tt <- (mean(x) - mu) / (sd(x) / sqrt(length(x)))
+pt(tt, df=length(x)-1)
+
+# why is the above value different from the t-test calculation from `t.test`?
+
+pt(tt, df=length(x)-1)*2
+
+
+hist(rt(10000, df=99), xlim=c(-7,7)) 
+abline(v=tt, lwd=3)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+### Two-sample
+
+X1-X2 / (sp)
+
+sp = sqrt((varx1  + varx2) / 2)
+
+sp is pooled variance
+
+```{r}
+
+x1 <- rnorm(100, 1, 2)
+x2 <- rnorm(100, 2, 1)
+
+t.test(x1, x2, var.equal=TRUE)
+
+
+sp <- sqrt((var(x1)+var(x2)) / 2)
+tt2 <- (mean(x1)-mean(x2)) / (sp*sqrt(2/length(x1)))
+
+df <- (2*length(x1)) - 2
+
+pt(tt2, df=df) * 2
+
+
+hist(rt(10000, df=df), xlim=c(-5,5)) 
+abline(v=tt2, lwd=3)
+
+
+## at larger sample sizes, the normal distribution is approximately equal to the t-distribution (a z-test is the equivalent, which assumes that we know lots). The normal distribution is commonly used for significance testing (which we won't really go into here much beyond this t-test bit). 
+
+pt(tt2, df=df)
+pnorm(tt2)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+I flip a coin 100 times and get the following outcomes. What is the probability that this is a fair coin ($p$ = 0.5)? (there are many ways to solve this problem. One approach would be to simulate a fair coin, calculate the number of heads, and compare this to the 'test' coin). 
+
+
+```{r}
+
+outcomes <- c(0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 
+1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 
+0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 
+0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 0, 0, 0, 0)
+
+
+
+# the cheat way (binomial exact test) 
+binom.test(sum(outcomes), n=100, p=0.5)
+
+pbinom(sum(outcomes), 100, 0.5) * 2
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## The logistic model of population growth 
+
+Incorporating probabilistic processes into simulation models allows researchers to not only see one realization of the dynamics given the parameters, but also to quantify and explore the variability in outcome solely as a result of random chance. We'll explore this a bit using a simple model of population dynamics.
+
+In deterministic logistic growth, a population grows with growth rate $r$ until it reaches a carrying capacity $k$. I code this model below and we can explore the dynamics. 
+
+
+```{r}
+
+
+logisticGrowth <- function(n, r, k){
+  n*exp(r*(1-(n / k)))
+}
+
+
+logisticDynamics <- function(n,r,k, steps=100){
+  ret <- c()
+  ret[1] <- n
+  if(length(r) == 1){
+    r <- rep(r, steps)
+  }
+  for(i in 1:(steps-1)){
+    ret[i+1] <- logisticGrowth(ret[i], r[i], k)
+  }
+  return(ret)
+}
+
+
+plot(logisticDynamics(n=2, r=0.25, k=100, steps=100), 
+  type='b', las=1, ylab='population size', xlab='time',
+  col='dodgerblue', pch=16)
+
+
+```
+
+
+
+But this is not how populations change over time, right? 
+
+Why not? 
+
++ No individual variation in birth rates
++ No temporal changes to carrying capacity or growth rate
+
+but perhaps most importantly ... 
+
+
+
+
+### Birth and death are probabilistic processes
+
+This process is often called 'demographic stochasticity', and is especially important when thinking about small population sizes. As a thought experiment, imagine flipping a fair coin 5 times. The probability of landing on 'heads' is 0.5, but with only 5 trials, the resulting number of heads is far more variable than if we flipped that same coin 100 times. Considering birth and death as probabilistic processes, we can start to understand how we might expect population dynamics to be more variable at small population sizes. That is, the effects of 'demographic stochasticity' are dependent on population density. 
+
+
+This does take us a bit away from the logistic model, as the code below does not consider the influence of carrying capacity $k$. 
+
+
+
+
+
+What if we treated birth as offspring drawn from a Poisson distribution, with some mean number of offspring $\lambda$? 
+
+```{r}
+
+logisticP1 <- function(Nt, b=0.1, d=0.1) {
+  births <- sum(rbinom(Nt,1,b))
+  deaths <- 0
+  pop <- (Nt + births - deaths) 
+  return(pop)
+}
+
+```
+
+So the model above treats birth as drawn from a Poisson distribution, and death as dependent on the population density.
+
+
+
+
+What if we treated death as binomial, with some probability $p$? 
+
+
+```{r}
+
+logisticP2 <- function(Nt, b=0.1, d=0.1) {
+  births <- sum(rbinom(Nt, 1, b))
+  deaths <- sum(rbinom(Nt, 1, d))
+  pop <- (Nt + births - deaths) 
+  return(pop)
+}
+
+```
+
+
+
+
+
+
+
+
+```{r}
+
+logisticPDynamics <- function(Nt, b, d, steps=1000, mod=logisticP1){
+  ret <- c()
+  ret[1] <- Nt
+  if(length(b) == 1){
+    b <- rep(b, steps)
+  }
+  if(length(d) == 1){
+    d <- rep(d, steps)
+  }
+  for(i in 1:(steps-1)){
+    ret[i+1] <- mod(ret[i], b=b[i], d=d[i])
+  }
+  return(ret)
+}
+
+
+plot(logisticPDynamics(10, b=0.1, d=0.1, mod=logisticP1, steps=100), 
+  type='l', las=1, ylab='population size', 
+  xlab='time', col='dodgerblue')
+
+```
+
+
+```{r results='hide'}
+
+# birth death equal
+plot(logisticPDynamics(10, b=0.1, d=0.1, mod=logisticP2, steps=100), 
+  type='l', ylim=c(0,30), 
+  las=1, ylab='population size', xlab='time',
+  col='dodgerblue')
+lapply(1:100, function(x){
+  lines(logisticPDynamics(10, b=0.1, d=0.1, mod=logisticP2, steps=100), col='dodgerblue')
+})
+
+
+
+
+# birth 2x death
+plot(logisticPDynamics(10, b=0.2, d=0.1, mod=logisticP2, steps=100), 
+  type='l', ylim=c(0,500),
+  las=1, ylab='population size', xlab='time',
+  col='dodgerblue')
+lapply(1:100, function(x){
+  lines(logisticPDynamics(10, b=0.2, d=0.1, mod=logisticP2, steps=100), col='dodgerblue')
+})
+
+
+
+
+# 1000 time steps
+plot(logisticPDynamics(10, b=0.1, d=0.1, mod=logisticP2, steps=1000), 
+  type='l', ylim=c(0,200),
+  las=1, ylab='population size', xlab='time',
+  col='dodgerblue')
+lapply(1:100, function(x){
+  lines(logisticPDynamics(10, b=0.1, d=0.1, mod=logisticP2, steps=1000), col=rainbow(100)[x])
+})
+
+```
+
+
+
+
+
+
+
+
+
+
+How would you incorporate the carrying capacity $k$ into the `logisticP2` function? Show how it influences population dynamics. 
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+### Infectious disease modeling 
+
+The SIR model is a _compartmental_ model of infectious disease, where the goal is to track the fraction of the population that is in each state (susceptible, infected, or recovered). Individuals move between these different states based on some probability of becoming infected ($\beta$) and some probability of recovery ($\gamma$). 
+
+\[ S = -\beta SI \]
+\[ I = \beta SI - \gamma I \]
+\[ R = \gamma I \]
+
+
+
+```{r}
+
+sirModel <- function(init=c(100,1,0), beta=0.1, gamma=0.09, 
+  steps=500, determ=TRUE){
+  s <- i <- r <- c()
+  s[1] <- init[1]/sum(init)
+  i[1] <- init[2]/sum(init)
+  r[1] <- init[3]/sum(init)
+
+  if(determ){
+    for(z in 2:steps){
+      s[z] <- s[z-1] - (beta*s[z-1]*i[z-1])
+      i[z] <- i[z-1] + (beta*s[z-1]*i[z-1]) - (gamma*i[z-1])
+      r[z] <- r[z-1] + (gamma*i[z-1])
+    }
+  }
+  if(determ==FALSE){
+    for(z in 2:steps){
+      infection <- (sum(rbinom(s[z-1], 1, beta*i[z-1])))
+      recovery <- (sum(rbinom(i[z-1], 1, gamma)))
+      s[z] <- s[z-1] - infection
+      i[z] <- i[z-1] + infection - recovery
+      r[z] <- r[z-1] + recovery
+    }
+  }
+  return(data.frame(s,i,r))
+}
+
+```
+
+
+
+
+
+
+```{r}
+
+plot(sirModel()$i)
+plot(sirModel(determ=FALSE)$i)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## sessionInfo 
+
+```{r}
+
+sessionInfo()
+
+```
+

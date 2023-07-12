@@ -1,0 +1,119 @@
+baseurl = ""
+languageCode = "en-us"
+defaultContentLanguage = "en-us"
+title = "Ecoinformatics"
+theme = "material"
+paginate = 7
+relativeurls = true
+publishDir = "docs"
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+
+[permalinks]
+  post = "/:year/:month/:slug/"
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+  archive = "archives"
+
+[author]
+  name = "Tad Dallas"
+  bio = ""
+  job = "Assistant Professor"
+  location = "U of South Carolina"
+  gravatarEmail = "tdallas@mailbox.sc.edu"
+  twitter = "taddallas"
+ 
+# Menu Configuration
+[[menu.main]]
+  weight = 1
+  identifier = "home"
+  name = "Home"
+  pre = "<i class='sidebar-button-icon fa fa-lg fa-home'></i>"
+  url = "/"
+[[menu.main]]
+  weight = 2
+  identifier = "syllabus"
+  name = "Syllabus"
+  pre = "<i class='material-icons'>date_range</i>"
+  url = "/syllabus"
+[[menu.main]]
+  weight = 3
+  identifier = "policies"
+  name = "Policies"
+  pre = "<i class='material-icons'>gavel</i>"
+  url = "/policies"
+
+
+[[menu.footer]]
+  weight = 2
+  identifier = "GitHub"
+  name = "Github"
+  pre = "<i class='button-icon fa fa-2x fa-github'></i>"
+  url = "https://github.com/ecoinformatix"
+
+[[menu.footer]]
+  weight = 4
+  name = "Textbook"
+  pre = "<i class='material-icons'>book</i>"
+  url = "http://r4ds.had.co.nz/"
+
+
+[[menu.sidebar]]
+  weight = 1
+  pre = "<i class='material-icons'>timeline</i>"
+  name = "computing in R"
+  url = "#r"
+[[menu.sidebar]]
+  weight = 2
+  pre = " <i class='material-icons'>bug_report</i>"
+  name = "host-virus data"
+  url = "#virion"
+[[menu.sidebar]]
+  weight = 3
+  pre = " <i class='material-icons'>trending_down</i>"
+  name = "ecological simulation"
+  url = "#sim"
+[[menu.sidebar]]
+  weight = 4
+  pre = " <i class='material-icons'>my_location</i>"
+  name = "making and evaluating models"
+  url = "#spatial"
+
+
+
+
+
+[[menu.tools]]
+  weight = 1
+  name = "GitHub"
+  url = "#github"
+  pre = "<i class='fa fa-github'></i>"
+[[menu.tools]]
+  weight = 2
+  name = " R "
+  url = "#r"
+  pre = "<i class='fa fa-terminal'></i>"
+[[menu.tools]]
+  weight = 3
+  name = "RMarkdown"
+  url = "#rmarkdown"
+  pre = "<i class='fa fa-file-pdf-o'></i>"
+[[menu.tools]]
+  weight = 4
+  name = "R Packages"
+  url = "#packages"
+  pre = "<i class='fa fa-archive'></i>"
+[[menu.tools]]
+  weight = 5
+  name = "Reproducibility"
+  url = "#reproducibility"
+  pre = "<i class='fa fa-recycle'></i>"
+
+
+
+
+[params]
+  dateFormat = "January 1, 2022"
+  background = "https://images.pexels.com/photos/2004161/pexels-photo-2004161.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  math = "true"

@@ -1,0 +1,314 @@
+---
+title: "An introduction to visualization in R"
+author: Tad Dallas
+includes:
+  in_header:
+    - \usepackage{lmodern}
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    highlight: tango
+    theme: journal
+---
+
+
+
+
+
+
+
+
+## Why is data visualization important?
+
+### exploratory data analysis
+
+Visualizations help identify interesting things about the data. This includes how the data are distributed, values that are outliers, and potential mistakes in data entry. 
+
+
+
+### clear demonstration of results relative to tables or statistics
+
+Visualizations are often more compelling at showing relationships between variables (and interactions between variables) than tables of statistical tests, and show more information than simple mean and standard deviations which would be reported in a table.
+
+
+### pretty
+
+Visualizations can be striking ways to show relationships. Nearly all academic manuscripts will contain at least one or two figures, and knowing how to make data-rich figures is an important skill. 
+
+
+
+
+
+
+
+Visualizations in R all start by identifying the plotting area (the regions of space where the actual figure goes relative to the margins and other bits). This is done using the `par` function before a plot is created. Even if you do not explicitly use `par`, there are default arguments to `par` which are used whenever you call a plotting function (e.g., `plot`). 
+
+## setting up the plotting window
+
+`par` takes a number of arguments. I will only go over a couple of common ones that are important to making figures which eliminate unnecessary white space. The most important of these is `mar`, which sets up the exterior plotting margins. This is the amount of whitespace on either side of the plotting area. 
+
+```{r}
+
+par(mar=c(4,4,0.5,0.5))
+
+```
+
+Running this code should open up a blank plotting window, but with margins present. The input to `mar` is a vector of 4 values, identifying the amount of space (in lines, I believe) for the bottom, left, top, and right plotting areas, respectively. 
+
+> What does the above code identify the margins as? Why do we opt to have values of 4 for the first 2 and then values of 0.5 for the second 2?
+
+
+## histograms
+
+Histograms are useful to explore the distribution of your data. The goal is to show frequencies (the number of times your data falls into a given bin or range of values). This is useful to start to explore the distribution of your data. 
+
+```{r}
+
+uniformRV <- runif(100)
+hist(uniformRV)
+
+```
+What we have done above is to create a vector of pulls from a uniform distribution (a distribution where every value between two bounds is equally likely of being sampled). The default range is between 0 and 1, so we should expect the histogram to look fairly 'flat', in that we expect that each bin in the histogram should have roughly the same frequency. Here we have 10 bins, so we should see about 10 observations in each bin. We can control the number of bins as well, using the `breaks` argument. This is useful because it also allows us more fine-scale control of how the data are binned. 
+
+```{r}
+
+hist(uniformRV, breaks=50)
+hist(uniformRV, breaks=c(0,0.25,0.5,0.75,1))
+
+hist(uniformRV, breaks=c(0,0.25,0.5,1))
+
+```
+
+Unequal bin sizes are sometimes useful for displaying the data, but notice that there was a switch on the y-axis in terms of what is actually being represented? It went from "frequency" (count of number of observations falling into that bin) to "density". For now, we won't go into this change or why it's important. Instead, let's make this plot a bit less ugly. 
+
+```{r}
+
+par(mar=c(4,4,0.5,0.5))
+hist(uniformRV, breaks=10, 
+  xlab='Our variable', ylab='Frequency', 
+  main='', las=1, 
+  col=adjustcolor('dodgerblue', 0.5), 
+  border='dodgerblue')
+
+```
+
+
+
+
+## scatterplots
+
+Most of the time, when we are thinking about plotting, we want to show the relationship between two or more variables. To do this, we can use the base `plot` function (which can powerfully handle many data of different types e.g., `numeric`, `factor`, etc.). So let's create a second variable (`uniformRV2`) and explore the relationship between the two continuous variables. 
+
+```{r}
+
+uniformRV2 <- runif(100, 10, 100)
+
+plot(uniformRV, uniformRV2)
+
+```
+
+And it looks like there's no relationship between the variables (because there isn't, right?). Another thing to note is that the order matters (`x` is the first argument to the plot function, so we could be more explicit about how we hand variables to the plotting function). And we can also start making this prettier. `hist` had a smaller list of arguments that we could hand to manipulate the display of the data. `plot` has many more arguments, as `plot` is the main function for visualization in R. In fact, packages written in R that deal with different types of data work with the `plot` argument to display data well beyond what the `plot` function was initially designed for, as we will see when we start visualizing maps and other fun stuff. Take some time and explore what arguments `plot` can take by issuing the command `?plot` into the R console. 
+
+```{r}
+
+plot(x=uniformRV, y=uniformRV2, 
+  pch=16, cex=2, las=1, 
+  xlab = 'Our first uniform variable', 
+  ylab='Our second uniform variable', 
+  col='firebrick')
+
+```
+
+It is important to note here that (as in many other areas of programming), the `plot` function will try to work with whatever information you give it, and this can sometimes lead you down weird paths. For instance, the `col`, `cex`, and `pch` arguments can accept vectors, where it expects you to provide a vector of the same length as the number of data points you have. This can be useful, as in the example below where we can color all points above a threshold a different color or point shape (`pch`). 
+
+```{r}
+
+plot(x=uniformRV, y=uniformRV2, 
+  pch=c(16,17)[1+(uniformRV2 > 50)], 
+  cex=2, las=1, 
+  xlab = 'Our first uniform variable', 
+  ylab='Our second uniform variable', 
+  col='firebrick')
+
+```
+
+This builds on what we previously learned about **conditionals**, as well as what we've learned about indexing vectors. Let's break this down. For the `pch` argument above, we create a vector of two values (`c(16,17)`) and then index these based on the output of a conditional. 
+
+```{r}
+
+1+(uniformRV2 > 50)
+
+```
+
+
+
+> Do the same as above, but indexing different colors for points on the x-axis (`uniformRV`). 
+
+
+
+
+
+
+### Showing mean and standard deviation 
+
+A common visualization is to show the mean and standard deviation of some continuous values across treatments. For instance, let's say we have an experiment where we expose plants to different combinations of nitrogen and phosphorous. If we have a single level of each of N and P, then it means we have 4 treatments (control, N, P, N+P), right? 
+
+> What is the importance of the control in this experiment?
+
+
+```{r}
+
+control <- rnorm(100, 2, 0.1)
+N <- rnorm(100, 3, 0.25)
+P <- rnorm(100, 3.5, 0.5)
+NP <- rnorm(100, 6, 0.4)
+
+```
+
+
+> How would you first start to visualize the data? 
+
+
+There are many different ways we could visualize the differences among treatments, depending on the amount of data we want to show. I'll start with the simplest, and then we can spend some time thinking about other ways to display the data. 
+
+So let's say I only want to see the means and standard deviations of the treatments. This means my x-axis will be treatment, and the y-axis will be the values obtained from the experiment in terms of plant performance. 
+
+```{r}
+
+plantDF <- data.frame(performance=c(control, N, P, NP), 
+  treatment=c(
+    rep('control',100), rep('N', 100), 
+    rep('P', 100), rep('NP',100))
+)
+
+plot(as.factor(plantDF$treatment), plantDF$performance)
+
+boxplot(plantDF$performance ~ plantDF$treatment)
+
+```
+
+Wait, what have we plotted? And why are there two ways to get the exact same plot? 
+
+
+This has to do with the plotting function being the R multi-tool in terms of visualization. I hand it a categorical variable and a continuous variable, and it defaults to visualizing these as a boxplot. There is also the `boxplot` function, which does the same thing, but needs the `formula` interface. The nice part about `boxplot` is that you can hand it as many vectors as you want and it'll create more levels to the plot. 
+
+```{r}
+
+boxplot(control, N, P, NP)
+
+```
+
+But wait...something else interesting happened here, right? There was a shift between the variables in the third and fourth positions. What's going on there? 
+
+
+R is ordering the x-axis alphabetically, such that our `NP` treatment is in the third position for the first two plots, but last when we explicitly hand the boxplot function the order we want. 
+
+```{r}
+
+plantDF$trtFactor <- factor(plantDF$treatment, levels=unique(plantDF$treatment))
+
+plot(plantDF$trtFactor, plantDF$performance)
+
+```
+
+This was a bit of a hacky solution, as I knew the order of the `levels` when I called `unique`. So `unique` provided a vector of the unique treatment levels, but it did so sequentially (so the way I had the data formatted forced it to be `control, N, P, NP`). We can also specify the order of the levels ourselves. 
+
+```{r}
+
+plantDF$trtFactor <- factor(plantDF$treatment, levels=c('control', 'N', 'P', 'NP'))
+
+plot(plantDF$trtFactor, plantDF$performance)
+
+```
+
+
+> So there's one way to visualize these data. Let's spend the next 10 minutes seeing what you can do to improve this visualization, either aesthetically, or by plotting it differently (are we seeing too much detail? not enough detail?)
+
+
+
+
+
+? maybe go into some of the boxplot specific syntax for making those less ugly?
+
+
+
+
+
+
+? Worth going into linear models and anova at this point? 
+
+```{r}
+
+summary(lm(plantDF$performance ~ plantDF$trtFactor))
+
+t.test(plantDF$performance[which(plantDF$trt=='control')], 
+  plantDF$performance[which(plantDF$trt=='N')])
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+### Adding things on top of visualizations 
+
+There are often many things that cannot be done with a single plotting call. That is, we need to add something to the plotting area (e.g., a legend). R has numerous functions that add things to existing plots, allowing complete controllability of what gets plotted. 
+
+
+```{r}
+
+plot(plantDF$trtFactor, plantDF$performance)
+title('Look at the differences when we add N and P!', line=1)
+points(y=plantDF$performance, x=plantDF$trtFactor,
+  col=adjustcolor(1,0.25), pch=16)
+
+legend('topleft', legend=c('control', 'N', 'P', 'NP'), 
+  col=1:4, pch=16, bty='n')
+
+```
+
+
+> Make the colors of the additional points (or of the boxes in the boxplot) match the colors that we have supplied in the legend? 
+
+
+In practice, this is not a great visualization. That is, we don't need the legend, as the x-axis already contains all that of that information. The goal with plotting is to keep the output as simple as possible while layering on the necessary and important information. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## sessionInfo 
+
+```{r}
+
+sessionInfo()
+
+```

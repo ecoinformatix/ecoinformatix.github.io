@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Reads on Ecoinformatics</title>
+    <link>/read/</link>
+    <description>Recent content in Reads on Ecoinformatics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language><atom:link href="/read/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Introduction to APIs</title>
+      <link>/read/api/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/api/</guid>
+      <description>Reading </description>
+    </item>
+    
+    <item>
+      <title>Iteration</title>
+      <link>/read/iteration/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/iteration/</guid>
+      <description>Read   R for Data Science textbook on Iteration: [r4ds-21]
+  Looping [SW carepntries]
+  </description>
+    </item>
+    
+    <item>
+      <title>Lists</title>
+      <link>/read/lists/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/lists/</guid>
+      <description>Reading   Good background on list objects
+  Decent primer on apply statements
+  </description>
+    </item>
+    
+    <item>
+      <title>Modeling probabilistic processes</title>
+      <link>/read/probability/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/probability/</guid>
+      <description>Read   Intro to probability distributions [cyclismo tutorial]
+  SIR model tutorial [SIR]
+  </description>
+    </item>
+    
+    <item>
+      <title>Parallelization</title>
+      <link>/read/parallel/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/parallel/</guid>
+      <description>Readings  Burton, A. W. (1991). Parallel processing in large-scale simulation: motivation and methods. Computing &amp;amp; Control Engineering Journal, 2(2), 74-79.
+ working with lists  Focus on the lists subsection [Advanced R]  parallel computing in R   Parallel computing in R [NCEAS tutorial]
+  parallel package [blog post]
+  </description>
+    </item>
+    
+    <item>
+      <title>plyr and dplyr</title>
+      <link>/read/dplyr/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/dplyr/</guid>
+      <description>RStudio Primers   Working with Data
+  Isolating Data with dplyr
+  Derive Information with dplyr
+  Readings   dplyr basic verbs: filter, arrange, select, and mutate, [r4ds-5.1 - 5.5]
+  group_by, summarize and friends [r4ds-5.6 - 5.7]
+  Relational Data (*_join functions) r4ds-13.1 - 13.7
+  Resources for continuous integration   Introduction [Travis-CI]
+  Introduction [Github Actions]
+  </description>
+    </item>
+    
+    <item>
+      <title>programming basics</title>
+      <link>/read/basics/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/basics/</guid>
+      <description> Complete the Programming Basics Primer on RStudio Cloud.  Reading   Introduction [r4ds-27.1]
+  R Markdown [r4ds-27.2]
+  Code chunks [r4ds-27.4]
+  Getting help in R  R&amp;rsquo;s Documentation Getting Help Guide 1.6: Getting Help  Reference   R Markdown Cheat Sheet
+  R Markdown Reference Guide
+  </description>
+    </item>
+    
+    <item>
+      <title>R plotting</title>
+      <link>/read/rplot/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/rplot/</guid>
+      <description>Reading   Introduction [Base plotting]
+  Principles of data visualization [Intro to DS]
+  Function writing resource  R for Data Science textbook: [r4ds-19]  </description>
+    </item>
+    
+    <item>
+      <title>SDMs and model performance</title>
+      <link>/read/performance/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/performance/</guid>
+      <description>Reading   Breiman, L. (2001). Statistical modeling: The two cultures (with comments and a rejoinder by the author). Statistical science, 16(3), 199-231.
+  SDMs SDM intro
+  Model performance and model comparison Norberg et al. 2020
+  </description>
+    </item>
+    
+    <item>
+      <title>Setup</title>
+      <link>/read/setup/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/setup/</guid>
+      <description>Reading The syllabus
+Other resources   Carey et al. (2019) Enhancing collaboration between ecologists and computer scientists: lessons learned and recommendations forward
+  Dynamic ecology blog post on comments from EO Wilson and the role of theory and code in ecology
+  A beginner&amp;rsquo;s guide to reproducible research paper
+  Prerequisites
+  Running R code
+  </description>
+    </item>
+    
+    <item>
+      <title>Statistical modeling</title>
+      <link>/read/model/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/model/</guid>
+      <description>Reading Spatial visualization resources   Static maps: tmap Vignette
+  Interactive maps: mapview Vignette
+  </description>
+    </item>
+    
+    <item>
+      <title>Style</title>
+      <link>/read/style/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/style/</guid>
+      <description>Read Code style</description>
+    </item>
+    
+    <item>
+      <title>The VIRION data</title>
+      <link>/read/virion/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/virion/</guid>
+      <description>Reading   Introduction [The VIRION data]
+  Read the opening sections of chapter 13 on Strings and working with Regular Expressions: Sections 14.1 - 14.3.
+  </description>
+    </item>
+    
+    <item>
+      <title>Version control and the command line</title>
+      <link>/read/git/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/read/git/</guid>
+      <description>Reading for this week:  Ram 2013. Git can facilitate greater reproducibility and increased transparency in science. Source code for biology and medicine, 8(1), 1-8.
+ Other resources   Git Setup: HappyGitWithR.com
+  Introduction to GitHub: GitHub intro
+  </description>
+    </item>
+    
+  </channel>
+</rss>

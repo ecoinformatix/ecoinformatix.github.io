@@ -1,0 +1,482 @@
+---
+title: "Working with strings"
+author: "Tad Dallas"
+includes:
+  in_header:
+    - \usepackage{lmodern}
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    highlight: tango
+    theme: journal
+---
+
+
+
+
+
+## VERENA
+
+The Viral Emergence Research Initiative (VERENA) is a global consortium. Our goal is to curate the largest ecosystem of open data in viral ecology, and build tools to help predict which viruses could infect humans, which animals host them, and where they could someday emerge.
+
+
+[Learn more about the consortium here](https://www.viralemergence.org/)
+
+
+
+
+## VIRION
+
+With over 3 million records, the Global Virome in One Network (VIRION) database is a living encyclopedia of vertebrate viruses - including the ones that pose the greatest threats to human health. Data like these pave the way for a new era of predictive science, and form the backbone for a broader data ecosystem we're building for animal disease surveillance.
+
+
+
+
+
+## Exploring the Virion data
+
+
+Download the Virion data from the link below:
+
+>  https://github.com/viralemergence/virion/tree/main/Virion
+
+
+There are many different bits of information, including detection information (how was the host-virus association quantified?), taxonomic information on hosts and viruses, and the host-virus association data. Let's load the entire dataset and get a better idea of the scope and nature of the data
+
+> https://github.com/viralemergence/virion/blob/main/Virion/Virion.csv.gz
+
+is where the data lives. It is compressed to avoid file size limitation on GitHub, but can be read into `R` using base functionality (or using the `vroom` package). 
+
+
+
+
+```{r eval=FALSE}
+# if you downloaded the file
+virion <- read.delim(gzfile('Virion.csv.gz'))
+
+```
+
+```{r}
+# reading directly from web resource
+con <- gzcon(url("https://github.com/viralemergence/virion/raw/main/Virion/Virion.csv.gz"))
+txt <- readLines(con)
+virion <- read.delim(textConnection(txt))
+
+```
+
+
+
+
+```{r}
+
+# make an interaction matrix
+virionInt <- table(virion$Host, virion$Virus)
+
+
+dim(virionInt)
+
+# how host-specific are viruses?
+hist(colSums(virionInt>0), 
+  col='dodgerblue', breaks=100, 
+  main='')
+abline(v=mean(colSums(virionInt>0)), lwd=2, col='grey')
+
+# on average, viruses infect around 2 species
+mean(colSums(virionInt>0))
+
+
+# but this one infects over x species
+which.max(colSums(virionInt[,-1] > 0))
+
+```
+
+
+This is the sort of exploratory data analysis that researchers do to try to understand the data. It can also be used to generate research questions. Why is influenza a virus so common in the data relative to the majority of other pathogens? How do patterns of host-virus associations change across different host groups (i.e., are there some pathogens that only infect certain groups of host species?). 
+
+
+
+
+So now we're working with real data, and specifically a lot of the data are structured in a way that we haven't really seen. Here, each row of the data is an interaction between a given host species and a given virus. The names of the virus and host species are given as strings. We've introduced strings, but not really dug into how to handle these types of data. So the goal of this lecture is two-fold; learn how to work with strings and start to gain experience working with real data to gain biological insight.  
+
+
+
+
+
+
+
+
+
+## String manipulation in base R
+
+So let's take a break from working with Virion directly, and instead talk about working with strings more generally. Strings are those variables that are identified as object type `character`. Commonly these will have quotes or single ticks around them. 
+
+```{r}
+
+vonn <- c('Everything was beautiful and nothing hurt')
+is.character(vonn)
+# this is a character vector with a single entry 
+
+# mess with case
+tolower(vonn)
+toupper(vonn)
+```
+
+Each string is made up of a set of characters, which can be queried using the `nchar` function.
+
+```{r}
+
+nchar(vonn)
+length(vonn)
+
+```
+
+> Why is there a difference between `length` and `nchar` here? 
+
+
+So we often have long vectors of strings, where we want to know something about each string itself. For instance, what if we wanted to extract the first word in a string? We would need to know how many characters to choose. In this case, we might want to say that the first word is defined as all characters from the start of the string until the first space is detected. 
+
+```{r}
+
+# get the first word in the string (if we know the size of the word)
+substr(vonn, 1, 10)
+
+# get the first word in the string (if we do not know the size of the word)
+spacez <- gregexpr(' ', vonn)
+str(spacez)
+substr(vonn, 1, spacez[[1]][1]-1)
+ 
+
+# get the last word in the string (if we know size)
+substr(vonn, nchar(vonn)-3, nchar(vonn))
+
+
+# get the last word in the string (if we do not know size)
+substr(vonn, 1+spacez[[1]][length(spacez[[1]])], nchar(vonn))
+
+```
+
+
+?? Let's do some practice work with gregexpr and substr before moving on??
+
+
+
+
+Now we can move on to how we actually manipulate the strings themselves (i.e., above we can pull out bits of strings, but what if we want to replace certain characters in a string?). An example of this could be if there are special characters which may throw errors, spelling mistakes, etc. that we want to resolve before we continue on to analysis. 
+
+```{r}
+
+# replace single characters 
+chartr('e', 'a', vonn)
+chartr('et', 'ad', vonn)
+
+
+# replace entire sets of characters
+gsub("Everything", "Nothing", vonn)
+
+# the use of the wildcard "."
+gsub(".", "Nothing", vonn)
+
+```
+
+
+
+But this all assumes that we are working with a vector of length 1 basically, right? A lot of times, when we work with characters, we will be working with longer vectors. As a toy example, we will take the `vonn` character vector (of length 1) and split it into a character vector where every word is a separate entry to the vector. If this does not make sense, no worries. We'll explore this in code below. 
+
+
+```{r}
+
+vonn2 <- strsplit(vonn, ' ')
+
+## what is the structure of vonn2?
+str(vonn2)
+
+vonn2 <- unlist(vonn2)
+
+## but what if we want to paste it back together? 
+paste(vonn2, collapse=' ')
+
+## paste is also really useful for appending or combining character strings with different properties
+
+paste(vonn2, LETTERS[1:length(vonn2)], sep='-')
+
+
+
+## but let's get back to vectors of characters instead of just whole sentences as strings
+vonn2 
+
+```
+
+
+
+
+
+So we have now have a vector of words that we can mess with. Luckily, a lot of the functionality we have covered about working with single strings translates to working with vectors of strings. 
+
+```{r}
+
+nchar(vonn)
+nchar(vonn2)
+
+tolower(vonn)
+tolower(vonn2)
+
+
+startsWith(vonn2, 'b')
+endsWith(vonn2, 'g')
+
+```
+
+
+
+Introducing `grep`. We sort of saw `grep` come up before in `grepexpr`. The idea behind much of these is that you have a `pattern` and you want to know either 1) if the pattern is present (`grepl`) or 2) where the pattern is present (`grep`). We'll go through some examples to clarify the differences and when you might want one over the other. 
+
+```{r}
+
+vonn2
+
+## So let's say we want to identify where the word `hurt` occurs in our character vector. We can do this in two ways.
+grepl("hurt", vonn2)
+grep("hurt", vonn2)
+
+```
+
+> How are these two related? Do you see any advantages or disadvantages to their use? 
+
+
+
+
+
+
+
+
+
+
+
+
+**Should we practice with some greps before moving on to tidyverse approach?**
+
+
+
+
+
+
+
+
+
+
+
+
+## String manipulation in the tidyverse
+
+I believe this is the first mention of the `tidyverse`, so let's talk about what that is. One of the strengths of R is that users can develop bodies of code (called packages or libraries) that offer additional functionality on top of the base language. We may have already introduced a package at this point, but hopefully not. The `tidyverse` is a collection of packages developed by the folks behind the RStudio IDE (company is now known as posit). A lot of introductory courses start with `tidyverse` packages as a way to get students up and running with R quickly. It certainly does help, and you are almost certainly going to run into many stackoverflow posts that offer `tidy` solutions to problems. Whether you want to use the `tidyverse` is 100% personal preference. I am typically of the mindset to limit `dependencies` in my code, where `dependencies` are those things that my code needs in order to run. If I were to need `stringr` (as the code below uses), it means that for someone else to use my code, they also need this library installed. But it's not just this library, but any library which `stringr` depends on. 
+
+Alright. So we can now start to use R packages to do some of the same manipulations (and more) that we previously did in base R. 
+
+```{r}
+
+#install.packages('stringr', repos='https://cloud.r-project.org')
+library(stringr)
+
+paste(vonn2, collapse=' ') == stringr::str_c(vonn2, collapse = ' ')
+
+
+substr(vonn2, 1, 3) == stringr::str_sub(vonn2, 1, 3)
+
+str_to_upper(vonn2)==toupper(vonn2)
+
+str_to_upper(vonn2, locale='tr')
+
+str_detect(vonn2, 'hurt') 
+
+str_detect(vonn2, '[0-9]')
+
+str_count(vonn2, 'u')
+
+str_locate(vonn2, 'ur')
+
+str_replace(vonn2, 'Everything', 'nothing')
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### VIRION 
+
+So let's go back to VIRION! We now have a set of tools that we can use to start to explore patterns of host-virus associations. 
+
+
+
+
+
+
+
+How many records exist for host species of the genus 'Abramis'?
+ 
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+How many unique pathogen species in the data have the word 'virus' in them?
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+How many host-virus records are from GenBank? 
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+How many host-virus records have a reference text that is a website?
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+Replace all instances of raccoon (species name is 'procyon lotor') with 'trash panda'.
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+How many times does the character string 'ad' appear in the `VirusFamily` column? 
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+Tie back into plotting. Maybe plot out parasite species richness across host species or something like that if time is available?
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+How many host species have more than 3 'e's in them? (easy with tidyverse, more challenging in base)
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## sessionInfo 
+
+```{r}
+
+sessionInfo()
+
+```

@@ -1,0 +1,380 @@
+---
+title: "Welcome to ecoinformatics"
+author: "Tad Dallas"
+includes:
+  in_header:
+    - \usepackage{lmodern}
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    highlight: tango
+    theme: journal
+---
+
+
+                    
+
+
+### What do I mean by 'ecoinformatics'?
+
+
+
+
+
+
+
+
+
+
+
+
+## Structure of the class
+
+### Syllabus 
+
+We will go over this the first day of class. 
+
+
+
+### My expectations
+
++ I expect that you apply yourself in an earnest attempt to learn the material. Everyone learns at their own pace, but I take it that if you were not interested in the material, you would not have signed up for the class? I think everyone here is excited to learn R for data analysis and visualization. 
+
++ I expect that you treat other students in the course fairly. I will not tolerate any form of discrimination or disparaging remarks to your colleagues. 
+
++ I expect that you do your own work. Every coder writes code differently. If I see the same code from two different people, it is a huge red flag. I will not accept copying of code, even if the original code was in the creative commons (you will get this joke later in the course if you do not understand now). 
+
+
+
+
+
+### Your expectations
+
+We will discuss these in the lecture. 
+
+
+
+
+
+
+
+## The tools you will learn
+
+You will have access to the machines in the Linux teaching lab, which currently run Ubuntu. Ubuntu is an operating system (just like Windows 11 or Mac OS). It is more user-friendly than you may think, and there are many benefits of using it. None of what we will learn will _require_ the use of a Linux OS, but it honestly may help. 
+
+**How will it help?**
+
+Ubuntu is an open source operating system and has a lot of things built in that you may need to otherwise configure (e.g., access to the terminal). I will try to showcase the use of the terminal as a way to interact with files on your machine, as it helps reinforce how file systems work (knowledge which cloud storage may have eroded) and to highlight the power of running things through terminal (you don't have to use RStudio if you don't want to). 
+
+_However, if you do not wish to use Ubuntu, you don't have to. Bring a laptop and work on something more familiar to you._
+
+
+
+
+
+
+
+
+
+
+
+---
+
+Lecture material is available on the [course website](https://ecoinformatix.github.io) and on the [GitHub organization](https://github.com/ecoinformatix). All code is written as **R markdown** files, the same format that you will submit your homework assignments in. Let's talk about what markdown is, and then we'll get into some bits about R markdown. 
+
+
+
+
+## What is markdown? 
+
+> Markdown is a lightweight markup language that you can use to add formatting elements to plaintext text documents. 
+
+
+
+
+
+
+## Why is it useful?
+ 
+Independent of operating system (portable and platform independent)
+
+Markdown is "future-proof" (plain text with some sprinkles, so it can be read by most any text editor)
+
+Can be used to make websites, presentations, and academic papers.
+
+
+
+
+
+
+
+
+
+### Markdown syntax
+
+Markdown reads like plain-text, but can be compiled into hmtl, pdf, and other useful formats. It has a bunch of benefits over other text formats (e.g., docx) in that it can do syntax formatting quite easily, is incredibly simple, and is independent of operating system. In an application like Microsoft Word, you click buttons to format words and phrases, and the changes are visible immediately. Markdown isn’t like that. When you create a Markdown-formatted file, you add Markdown syntax to the text to indicate which words and phrases should look different.
+
+
+We will first go over the syntax of markdown, then introduce embedding code chunks and making a reproducible document. This last part is probably the biggest benefit of using markdown.
+
+
+
+
+## Headers
+
+Creating headings (like the one above that says "Headers") is quite easy, and is accomplished with nested "#" symbols. Heading level 1 (the largest text heading) is acheived with 1 "#" followed by a space and the heading text.
+
+```
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+
+```
+
+
+# Heading 1
+
+## Heading 2
+
+### Heading 3
+
+#### Heading 4
+
+##### Heading 5
+
+
+
+
+
+## Paragraphs
+
+Paragraphs are started by just typing in text with one hard return after the heading title. For many text editors, this is not even necessary, and much of markdown writing handles blank space really well (try this out for yourself by increasing the number of lines between blocks and text and observing the lack of difference it makes). 
+
+There is no need to format the text yourself in terms of indentation or anything. Markdown will do this for you, and you can control how the document appears using the _yaml_ header. _yaml_ stands for "yet another markup language" and is used to template how the markdown appears. For instance, in this document, the _yaml_ header is 
+
+
+```
+---
+title: "An introduction to R and R markdown"
+author: Tad Dallas
+date: 
+output: pdf_document
+---
+
+```
+
+This provides title and author information, as well as information on how to output the file. The raw markdown will be formatted into one of many different formats, with the two most common being "pdf" or "html". 
+
+
+
+## Emphasis
+
+Bold and italic characters are straightforward in markdown, with italics denoted with a `_` character on either side of the italicized text (e.g., `_word_` becomes _word_). 
+
+Bold text is just as simple, with two `*` characters surrounding whatever bold text you would like (e.g., `**word**` becomes **word**). 
+
+
+
+## Block quotes
+
+Indented and pretty block quotes are easy to add as well, by just using the ">" operator. 
+
+```
+> Everything was beautiful, and nothing hurt. 
+```
+
+becomes 
+
+> Everything was beautiful, and nothing hurt. 
+
+
+
+
+## Lists 
+
+Bulleted or enumerated lists are simple as well. 
+
+```
+1. Break an egg
+2. Make an omelette 
+3. Eat the omelette
+```
+
+becomes
+
+1. Break an egg
+2. Make an omelette 
+3. Eat the omelette
+
+
+Itemized lists without the enumeration (no numbers, so just a bulleted list) are acheived with similar syntax. Here any of the following can be used to delineate an item in a list ("*, -, +"), so 
+
+```
++ Eggs
+* Grits
+- Cheese
+```
+
+becomes
+
++ Eggs
+* Grits
+- Cheese
+
+
+## Hyperlinks
+
+Hyperlinks can be embedded using the syntax 
+
+```
+[link](url)
+```
+
+For instance, if you want to download R [click here](https://www.r-project.org/)
+
+
+
+## Images
+
+Images can be embedded into markdown without the copy-paste approach of things like Microsoft Word, which can butcher images depending on OS (have you ever tried to open a Powerpoint on a different computer and all the formatting and images are messed up?)
+
+To embed an image, the syntax is simply
+
+```
+![caption](image)
+```
+
+an example
+
+![cat](https://th-thumbnailer.cdn-si-edu.com/bZAar59Bdm95b057iESytYmmAjI=/1400x1050/filters:focal(594x274:595x275)/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer/95/db/95db799b-fddf-4fde-91f3-77024442b92d/egypt_kitty_social.jpg)
+
+
+
+
+## Code
+
+Now we can get into why markdown is really useful, and how we will use it in this course. Markdown allows for the embedding of code chunks, and will highlight their syntax.
+
+```{r}
+y <- 1
+y
+```
+
+This is nice for tutorials or when we need to clearly show code. But what if we also want the code to be executable (i.e., to run and produce output)? This is where R markdown comes in. 
+
+
+
+
+
+
+
+
+
+
+
+## What is R markdown?
+
+R markdown is basically a flavor of markdown that allows _R_ code to be executed. So that block above that sets the value of _y_ to 1 and then outputs y? This is R code that can be executed as follows:
+
+
+```{r}
+y <- 1
+y
+```
+
+Now we see that it highlighted the syntax based on R syntax (the one becomes blue), and the code is run and outputs the value of y when we tell it to. 
+
+
+## Why does this matter?
+
+This matters because now we have a way to embed text and executable code into a single document. For instance, I have been collecting data every year on the number of emails I receive. I want to be able to hand a single document and the data over to someone and have them see my text explanation, my analytical code, and the output. This can be done easily in R markdown. 
+
+
+Also, consider that I continue collecting data. The analysis which is run every time the R markdown is compiled can handle dynamic data. This means that the pipeline is already there whenever I add more data to the data file, such that I can easily run the analyses and see what changes. 
+
+
+
+
+## How do we compile an R markdown file?
+
+We have gone over the basics of markdown, and discussed the benefits of the markup language. An important step is to be able to compile the markdown into an output such as pdf of html. This is the end result that you can hand to someone non-technical and they will be able to see everything you did, the analyses you performed, and the plots you created. There are many ways to compile the R markdown document, but the easiest way will be through Rstudio. 
+
+
+### What is Rstudio?
+
+RStudio is an IDE (integrated development environment) for R, a statistical programming language upon which much of this class is focused on. By analogy, R is the engine that does all the heavy lifting, and RStudio is the nice dashboard that organizes your files, code, and such on your screen. 
+
+
+#### Let's pause now to download R and RStudio on our computers
+|  |  |
+|---|---|
+|**RStudio** | https://rstudio.com/products/rstudio/download/#download |
+|**R** | https://www.r-project.org/ |
+
+
+Once we have both R and RStudio installed, open RStudio (not R). R has its own IDE, but it is not as feature-rich as RStudio. I prefer to not use either, and will give instructions next on how to use R and compile R markdown from the command line. 
+
+
+
+
+**RStudio**
+Open the R markdown (Rmd) file in RStudio. On the taskbar, there should be a ball of yarn and a drop down menu that says "Knit". Click on `Knit` and the document will compile. Select the drop down to select options of output. 
+
+((go through this in class))
+
+
+**Command line**
+The command line is your friend. Long after RStudio has faded into oblivion, the command line will exist. You've been introduced to the command line already in previous lectures. We can run R from the command line. Simply open up your terminal window (program called `terminal` in Ubuntu or right-click and select "Open in terminal" from menu)
+
+
+```{bash, eval=FALSE}
+R
+```
+
+That's it. Now you have an R session within a terminal. Navigate to the directory where your Rmd file is stored, and simply enter
+
+```{r, echo=TRUE, eval=FALSE}
+
+rmarkdown::render('yourFile.Rmd')
+
+```
+
+If you need to first install the `rmarkdown` package, simply enter the command 
+
+```{r, eval=FALSE}
+# install.packages('rmarkdown')
+
+library(rmarkdown)
+
+```
+
+
+Alright. So now we know R markdown syntax, and we have R and RStudio installed. Let's learn some R. 
+
+
+
+
+
+
+
+
+
+
+
+
+## sessionInfo 
+
+```{r}
+
+sessionInfo()
+
+```
