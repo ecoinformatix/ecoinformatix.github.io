@@ -4,7 +4,7 @@ defaultContentLanguage = "en-us"
 title = "Ecoinformatics"
 theme = "material"
 paginate = 7
-relativeurls = true
+relativeurls = false
 publishDir = "docs"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
