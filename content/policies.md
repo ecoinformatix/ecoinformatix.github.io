@@ -17,16 +17,6 @@ The majority of the course will be taught as live-coding demonstrations, where s
 
 
 
-## Assignment policy
-
-Data science is about analyzing real-world data sets, and so a series of projects involving real data are a required part of the course. 
-
-All assignments are due by immediately **before** the start of class on the day indicated. 
-
-Assignments should be submitted as instructed (through GitHub).
-
-
-
 
 ## Grading
 
@@ -51,16 +41,32 @@ Participation  | 10%
 Project        | 40% 
 
 
-Homework exercises are set up to be the same for both undergraduate and graduate students. This may change depending on how much folks struggle. The point is not to overwhelm, but to get everyone as much experience and excitement as possible without overburdening. 
 
-Details of grading criteria will not usually be announced in advance. It is expected that students in this course will have a wide range of prior experience and ability, and grading will aim to reflect learning and effort in the course. It is certainly possible for all students to receive high grades in this course if all of you show mastery of the material and completely attempt all assignments.
+
+
+
+
+
+### Homework assignments 
+
+There will be a total of 4 homework assignments, corresponding to the number of modules in the course. Homework exercises are set up to be the same for both undergraduate and graduate students. This may change depending on how much folks struggle. The point is not to overwhelm, but to get everyone as much experience and excitement as possible without overburdening. 
+
+All assignments are due by immediately **before** the start of class on the day indicated. 
+
+Assignments should be submitted as instructed (through GitHub). 
+
+Details of grading criteria will not usually be announced in advance. It is expected that students in this course will have a wide range of prior experience and ability, and grading will aim to reflect learning and effort in the course. Every commit you make in your homework will run your code through a set of checks. These checks are just as much for me as for you. They can tell you if a test has failed, and you have access to see which tests your response has failed to meet. 
+
+
+
+
 
 
 
 
 ### Project details 
 
-The project will be a demonstration of your learning and allow you to use the new tools you have acquired in the course. This will be done in small groups (2-3) for undergraduates and will be a solo project for graduate researchers. 
+The project will be a demonstration of your learning and allow you to use the new tools you have acquired in the course. This will be done in small groups (2-3) for undergraduates and will be a solo project for graduate researchers. The grading criteria will be slightly different between undergraduate teams and graduate researchers, as my expectations are different. However, all projects should hit the following points. 
 
 The final project will be an R markdown document that reads in and analyzes a data source. I can provide data, if necessary, but would prefer if data came from the student (either from their research or on something they are passionate about). 
 
@@ -70,9 +76,8 @@ The final project will consist of 3 parts. First, you will develop a project pro
 
 This means that I will expect not only a well-written and clear manuscript, but also documentation to easily reproduce all analyses, figures, and compile manuscript text.
 
-
 **Final project proposal**
-Please prepare a short proposal on your final project idea by February 17. The proposal should include:
+Please prepare a short proposal on your final project idea by the end of the first course module. The proposal should include:
 
 - Title & description of the project
 - Team members names
@@ -82,12 +87,20 @@ Please prepare a short proposal on your final project idea by February 17. The p
 Please create your proposal in a markdown file called `proposal.md` in the root directory of the final project repo.
 
 
+
 **Project development**
-You will develop the project throughout the semester, using tools and approaches that you learn during the course. 
+You will develop the project throughout the semester, using tools and approaches that you learn during the course. Do this early and consistently. I will be able to track your progress on GitHub, meaning that I expect to see continued development on the project and not a last minute flurry of commits. 
+
+Graduate students: this is an opportunity to push forward your research. Ideally, the resulting project manuscript is something that could be submitted to an academic journal. 
+
 
 
 **Final product**
 You will present your final project as a 15 minute presentation at the end of the semester. It should provide context and information about the 'what, why, and how' of your research question, and go through your findings, preferably demonstrating your ability to visualize data. 
+
+Graduate students: think of this as something you would feel comfortable presenting at an academic conference. 
+
+
 
 
 

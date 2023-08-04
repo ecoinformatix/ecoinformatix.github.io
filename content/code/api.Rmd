@@ -49,7 +49,7 @@ The request contains:
 + a query containing the parameters of the request (center=Manchester,England&zoom=13&size=600x300&maptype=roadmap). In this case, we have specified the location, zoom level, size and type of map.
 
 
-Web service APIs use two key HTTP verbs to enable data requests: GET and POST. A GET request is submitted within the URL with each parameter separated by an ampersand (&). A POST request is submitted in the message body which is separate from the URL. The advantage of using POST over GET requests is that there are no character limits and the request is more secure because it is not stored in the browser’s cache.
+Web service APIs use two key HTTP verbs to enable data requests: GET and POST. A GET request is submitted within the URL with each parameter separated by an ampersand (&). A POST request is submitted in the message body which is separate from the URL. The advantage of using POST over GET requests is that there are no character limits and the request is more secure because it is not stored in the browser's cache.
 
 There are several types of Web service APIs (e.g. XML-RPC, JSON-RPC and SOAP) but the most popular is Representational State Transfer or REST. RESTful APIs can return output as XML, JSON, CSV and several other data formats. Each API has documentation and specifications which determine how data can be transferred. 
 
@@ -115,7 +115,7 @@ This apply statement gets information on the title of each of the works returned
 
 ```{r}
 
-sapply(vonInfo[[4]], function(x){
+vonTitle0 <- sapply(vonInfo[[4]], function(x){
   x$title
 })
 
@@ -153,9 +153,10 @@ This is better, as it now provides information on books where Vonnegut was liste
 
 ```{r}
 
-sapply(vonInfo2[[4]], function(x){
+vonTitle <- sapply(vonInfo2[[4]], function(x){
   x$title
 })
+
 
 ```
 

@@ -33,7 +33,7 @@ lessons:
     topics: "Visualization basics"
     reading: "read/rplot"
     code: "code/rplot"
-    homework: "" 
+    homework: "https://classroom.github.com/a/-YNGJobd" 
 
 
 
@@ -61,7 +61,7 @@ lessons:
     topics: "Data manipulation (base + plyr/dplyr)"
     reading: "read/dplyr"
     code: "code/dplyr"
-    homework: "" 
+    homework: "https://classroom.github.com/a/UsHuvYl0" 
 
 
 
@@ -94,7 +94,7 @@ lessons:
     topics: "Probabilistic processes"
     reading: "read/probability"
     code: "code/probability"
-    homework: "" 
+    homework: "https://classroom.github.com/a/mEPLPw89" 
 
 
 
@@ -135,7 +135,7 @@ lessons:
     topics: "Making informed models + model performance"
     reading: "read/performance"
     code: "code/performance"
-    homework: "" 
+    homework: "https://classroom.github.com/a/okgyNtNK" 
 
 
 

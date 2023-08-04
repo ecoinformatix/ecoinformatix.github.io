@@ -4,12 +4,15 @@ markup: "goldmark"
 ---
 
 
-  <span> </span>     | <span> </span>
-  :-----------| :--------------------------:
-  Instructor | [Tad Dallas](https://taddallas.github.io)  <a href="mailto:tdallas@mailbox.sc.edu" title="email"><i class="fa fa-envelope"></i></a>  <a href="https://github.com/taddallas" title="GitHub"><i class="fa fa-github"></i></a> |
-  Location     |  Jones 101  |
-  Times        |  T & TH 2:50 - 4:05pm  |
-  Office Hours |  T 1:00 - 2:30pm       |
+#### Instructor | [Tad Dallas](https://taddallas.github.io)  
+#### Location   |   Jones 214  
+#### Times      |  T & TH 2:50pm - 4:05pm     
+#### Drop-in hours |  Th from 1:00pm - 2:40pm  
+
+---
+
+All [notes as pdf](https://github.com/ecoinformatix/ecoinformatix.github.io/tree/master/content/pdfNotes) can be found on the GitHub page. These are the same as the [html files on the syllabus page](https://ecoinformatix.github.io/syllabus/)
+
 
 
 

@@ -80,10 +80,10 @@ There are a number of ways we can improve reproducibility in the code we write.
 
 
 ```{r}
-set.seed(1234)
-rbinom(10, 1, 0.25)
-rbinom(10, 1, 0.25)
-rbinom(10, 1, 0.25)
+set.seed(1234); rbinom(10, 1, 0.25)
+set.seed(1234); rbinom(10, 1, 0.25)
+
+set.seed(1234);rbinom(10, 1, 0.5); rbinom(10,1,0.5); rbinom(10, 1, 0.25)
 
 set.seed(123)
 rbinom(10, 1, 0.25)
