@@ -196,8 +196,72 @@ And now we have a Fibonacci sequence starting with `c(0,1)`.
 
 
 
+### Apply statements
+
+`apply` statements exist in many types, depending on the data.structure you wish to do the action on: e.g. `apply`, `sapply`, `lapply`, `vapply`, `tapply`. We will focus on `apply` and `lapply`, but realize that these other options may be better suited for your use case (especially `vapply`, which gives you a bit more control over output format). In the loop above, we wanted to find the mean of each entry in a list. We used a `for` loop to loop over elements, and stored the resulting means in a vector called `out`. Instead, we could use `lapply`...the `l` in it means it performs some action on a list object. 
 
 
+```{r}
+lapply(X=testList2, FUN=mean)
+```
+
+The output of `lapply` will always be a list, which is nice in some instances and not nice in others. `sapply` is a wrapper for `lapply` which always returns a vector of values.
+
+
+```{r}
+sapply(X=testList2, FUN=mean)
+```
+
+
+Now that we have an idea of what the `apply` family of functions do, we can look specifically at `apply`, which operates on matrices or data.frames. What if we wanted to calculate the mean of every column or row in a data.frame? We could loop over each column or row...
+
+```{r}
+
+testDF <- data.frame(a=runif(100), b=rpois(100,2), d=rbinom(100,1,0.5))
+
+
+# over columns
+ret <- c()
+for(i in 1:ncol(testDF)){
+	ret[i] <- mean(testDF[,i])
+}
+
+
+# over rows
+ret <- c()
+for(i in 1:nrow(testDF)){
+	ret[i] <- mean(unlist(testDF[i, ]))
+}
+
+```
+
+
+Or we could use apply statements
+
+```{r}
+
+apply(X=testDF, MARGIN=2, FUN=mean)
+apply(X=testDF, MARGIN=1, FUN=mean)
+
+```
+
+One advantage is that indexing rows of a data.frame is a pain, which is why we had to `unlist` each row in the for loop over rows above. If we do not do this, we get a vector of NA values. This is because a data.frame is a list of vectors. This is why column-wise operations on data.frames can also be performed using `lapply` (if we wanted list output) or `sapply` (if we wanted vector output).
+
+```{r}
+lapply(X=testDF, FUN=mean)
+sapply(X=testDF, FUN=mean)
+```
+
+
+
+
+
+
+
+
+
+
+## A fun class exercise 
 
 You are creating a game of rock-paper-scissors. In the game, each player can select their strategy, and the strategy can be different in each trial (where there can be 100s of trials). 
 
@@ -208,6 +272,8 @@ strat <- sample(c('rock','paper', 'scissors'), 100, replace=TRUE)
 
 ```
 
+
+
 Write a for loop to simulate rock-paper-scissors game of 500 trials between two players, where my strategy above is one of the players. 
 
 ```{r}
@@ -216,12 +282,18 @@ Write a for loop to simulate rock-paper-scissors game of 500 trials between two 
 ```
 
 
+
+
+
 How would you go about changing the strategy of the other player to beat my strategy? 
 
 ```{r}
 
 
 ```
+
+
+
 
 
 

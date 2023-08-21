@@ -26,7 +26,8 @@ Grades will be assigned using the following weighted components:
 
 component      | weight
 :---------------|-----:
-HW Exercises   | 50% 
+HW Exercises   | 30% 
+In class problems| 20%
 Participation  | 10% 
 Group project  | 40% 
 
@@ -36,7 +37,8 @@ Group project  | 40%
 
 component      | weight
 :---------------|-----:
-HW Exercises   | 50% 
+HW Exercises   | 30% 
+In class problems| 20%
 Participation  | 10% 
 Project        | 40% 
 
@@ -56,6 +58,16 @@ All assignments are due by immediately **before** the start of class on the day 
 Assignments should be submitted as instructed (through GitHub). 
 
 Details of grading criteria will not usually be announced in advance. It is expected that students in this course will have a wide range of prior experience and ability, and grading will aim to reflect learning and effort in the course. Every commit you make in your homework will run your code through a set of checks. These checks are just as much for me as for you. They can tell you if a test has failed, and you have access to see which tests your response has failed to meet. 
+
+
+
+### In-class problems 
+
+Every week we will have a coding problem that students will do in class. This will be something fairly low stakes, and will try to reinforce the material from that week (e.g., if the lecture is on loops, expect to be writing a loop in the in-class problem). These will start on week 2 (or maybe 3) of the course, and run until week 14 (so between 10 and 11 in-class problems total). These must be completed during class time, and I will do my best to allocate 10-15 minutes at the end of Thursday lecture for this. If we can't fit it in, the problem will be due by midnight on Thursday. 
+
+Set up a private repository on GitHub called `codePractice`. You will upload your answers to this repo (you can just use the `Add file` drop-down from the right panel at the top of the repository). Name the file `weekX.Rmd`, where `X` corresponds to the number of that week (e.g., `week2.Rmd`).
+
+
 
 
 

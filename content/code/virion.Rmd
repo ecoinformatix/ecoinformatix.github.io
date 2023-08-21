@@ -252,6 +252,40 @@ grep("hurt", vonn2)
 
 
 
+But `grep` is quite extensible. Here, we'll go over how to format queries to `grep` depending on what you want as an output. Much of this will simply boil down to how the query is formulated. There is some specific syntax to `grep` that will be helpful. 
+
+For instance, the use of **anchors** allows you to match only those strings with your query in a particular place in the string. For instance, if we want to identify words in a string starting with a letter, we can use the `^query` notation (the little `^` symbol indicates that the line must start with that letter or string). Further, we can use `$` at the end of a query to mean only find those strings that end in some query. 
+
+
+```{r}
+
+vonn2
+
+# how many words contain an `a`? 
+grep('a', vonn2)
+
+
+# how many words start with `a`?
+grep('^a', vonn2)
+
+# how many words end with `l`?
+grep('l$', vonn2)
+
+```
+
+
+We cannot directly combine these, as the combination of `^` and `&` will search for an **exact match** of a given string. This is useful, but perhaps not what we're looking for. In the command line `grep` (`grep` is not just a thing in `R`), we can issue multiple commands 
+
+
+```{r}
+
+# how many words start and end with `h`?
+grep('^h$', vonn2)
+grep('^h$', 'huh')
+
+grepl('^h', 'huh') & grepl('h$', 'huh')
+
+```
 
 
 
@@ -260,7 +294,6 @@ grep("hurt", vonn2)
 
 
 
-**Should we practice with some greps before moving on to tidyverse approach?**
 
 
 

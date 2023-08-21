@@ -156,6 +156,14 @@ This builds on what we previously learned about **conditionals**, as well as wha
 
 
 
+
+
+
+
+
+
+
+
 ### Showing mean and standard deviation 
 
 A common visualization is to show the mean and standard deviation of some continuous values across treatments. For instance, let's say we have an experiment where we expose plants to different combinations of nitrogen and phosphorous. If we have a single level of each of N and P, then it means we have 4 treatments (control, N, P, N+P), right? 
@@ -194,7 +202,10 @@ boxplot(plantDF$performance ~ plantDF$treatment)
 
 ```
 
-Wait, what have we plotted? And why are there two ways to get the exact same plot? 
+> Wait, what have we plotted? And why are there two ways to get the exact same plot? 
+
+
+
 
 
 This has to do with the plotting function being the R multi-tool in terms of visualization. I hand it a categorical variable and a continuous variable, and it defaults to visualizing these as a boxplot. There is also the `boxplot` function, which does the same thing, but needs the `formula` interface. The nice part about `boxplot` is that you can hand it as many vectors as you want and it'll create more levels to the plot. 
@@ -235,18 +246,11 @@ plot(plantDF$trtFactor, plantDF$performance)
 
 
 
-? maybe go into some of the boxplot specific syntax for making those less ugly?
-
-
-
-
-
-
-? Worth going into linear models and anova at this point? 
 
 ```{r}
 
-summary(lm(plantDF$performance ~ plantDF$trtFactor))
+plantMod <- lm(plantDF$performance ~ plantDF$trtFactor)
+summary(plantMod)
 
 t.test(plantDF$performance[which(plantDF$trt=='control')], 
   plantDF$performance[which(plantDF$trt=='N')])
@@ -285,13 +289,129 @@ legend('topleft', legend=c('control', 'N', 'P', 'NP'),
 > Make the colors of the additional points (or of the boxes in the boxplot) match the colors that we have supplied in the legend? 
 
 
-In practice, this is not a great visualization. That is, we don't need the legend, as the x-axis already contains all that of that information. The goal with plotting is to keep the output as simple as possible while layering on the necessary and important information. 
 
 
 
 
 
 
+
+In practice, this is not a great visualization. That is, we don't need the legend, as the x-axis already contains all that of that information. The goal with plotting is to keep the output as simple as possible while layering on the necessary and important information. This gets at some of the underlying ideas around what makes compelling visualizations. One of the figures in this field is Edward Tufte, who emphasizes some core principles of visualization design:
+
+
++ The representation of numbers, as physically measured on the surface of the graph itself, should be directly proportional to the numerical quantities represented
+    
++ Clear, detailed and thorough labeling should be used to defeat graphical distortion and ambiguity. Write out explanations of the data on the graph itself.  Label important events in the data.
+
++ Show data variation, not design variation.
+
++ In time-series displays of money, deflated and standardized units of monetary measurement are nearly always better than nominal units.
+
++ The number of information carrying (variable) dimensions depicted should not exceed the number of dimensions in the data. Graphics must not quote data out of context.
+
+
+
+### What other types of plotting do we do? 
+
+Above we have gone over some pretty typical types of visualizations, but there are likely many more (e.g., we'll go over spatial visualizations later in the semester). Recall that model we fit above for the plant data (`plantMod`)? The model is a linear model object, which we called `summary` on to see some of the results. `summary` is a base function that can work with many different variable classes and types of data. To emphasize this, look at the help files for `?summary` and for `?summary.lm`. It's the same function, but `summary.lm` is designed to report the results of the linear model. `plot` is also like this. 
+
+```{r}
+
+plot(plantMod)
+
+```
+
+
+We won't go over all of what these mean, but they are essentially checks on the data to test the assumptions of the underlying linear model. This is useful plotting for visually checking the assumptions of your analyses. 
+
+
+But there are other types of plotting we may be interested in. How about heatmaps, which are really useful at showing the interacting effects of two variables on a response. 
+
+
+
+```{r}
+
+tmp <- 1:10 %*% t(1:10)
+
+# a base R version 
+image(tmp)
+
+image(tmp, col=viridis::viridis(100), 
+  xlab='Variable 1', ylab='Variable 2', 
+  las=1)
+
+
+# a lattice version 
+lattice::levelplot(tmp)
+
+```
+
+
+Note that many of the arguments are shared across base R plotting (e.g., `col`, `xlab`, `axes`, `las`, `pch`, etc. etc. etc.). This common language is a strength of base R plotting. Some of these variable names are used in other packages (e.g., xlab/ylab in `lattice`), but try to edit the `levelplot` code and get ready for some confusion (try to change the color ramp). 
+
+
+
+
+
+## Interactive visualizations 
+
+Static visualizations are most of what we do as scientists, because often the figures are used in presentations and publications. However, interactive graphics that allow users to view tooltips (data that is shown on hover or click) can be really nice for communicating data. 
+
+
+
+```{r}
+
+library(plotly)
+
+fig <- plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length, color = ~Species)
+fig
+
+```
+
+This is useful, but the tooltips just tell us the x and y positions. Below, we modify this to 
+
+
+```{r}
+
+d <- diamonds[sample(nrow(diamonds), 1000), ]
+
+fig <- plot_ly(
+  d, x = ~carat, y = ~price,
+  # Hover text:
+  text = ~paste("Price: ", price, '$<br>Cut:', cut),
+  color = ~carat, size = ~carat
+)
+
+fig
+
+```
+
+
+
+Hopefully that worked. It was storing the plot in a temporary folder and not showing me the html on my computer, so fingers crossed that's just my machine. If not, no worries. This is supposed to just be a quick overview. A final note is that the above plots are different from base plot in another way apart from being interactive. They use a plotting system called `ggplot2`, short for the `grammar of graphics`. This package was developed by Hadley Wickham (Posit) and is now supported by a team of developers and used by a lot of folks. It relies on the use of linked functions to modify an existing plot. For instance, 
+
+
+```{r}
+
+library(ggplot2)
+
+ggplot(mpg, aes(displ, hwy, colour = class)) 
+
+```
+
+
+This only sets up the plotting window. It sets up the axes to correspond to our chosen variables (`aes(displ, hwy...` corresponds to those columns in the mpg data.frame). To actually get it to plot the data though, we have to specify a layer such as `geom_point()`. 
+
+```{r}
+
+ggplot(mpg, aes(displ, hwy, colour = class)) + geom_point()
+ggplot(mpg, aes(displ, hwy, colour = class)) + geom_hex()
+ggplot(mpg, aes(displ, hwy, colour = class)) + geom_violin()
+
+```
+
+
+This provides a lot of flexibility, and lots and lots of room for fun errors (e.g., the violin plot from above makes zero sense). 
 
 
 

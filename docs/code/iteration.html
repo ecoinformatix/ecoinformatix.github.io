@@ -231,6 +231,7 @@ ul.task-list{list-style: none;}
 </style>
 
 
+
 <style type="text/css">
 code {
 white-space: pre;
@@ -310,13 +311,20 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; }
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -352,6 +360,9 @@ outline: none;
 summary {
 display: list-item;
 }
+details > summary > p:only-child {
+display: inline;
+}
 pre code {
 padding: 0;
 }
@@ -370,23 +381,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -459,13 +464,25 @@ tools around data subsetting and summarising. We ended that lecture by
 discussing <code>dplyr</code>, a useful package for data processing.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(plyr)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
 <p>Recall that towards the end of that lecture, we introduce piping
 commands with <code>dplyr</code> to summarise data. For instance, the
 code below calculates mean life expectancy (<code>lifeExp</code>) by
 <code>country</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">mnLifeExp=</span><span class="fu">mean</span>(lifeExp))</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">mnLifeExp=</span><span class="fu">mean</span>(lifeExp))</span></code></pre></div>
 <p>Approaching this with <code>dplyr</code> offers us a powerful way to
 summarise our data, but you will inevitably hit the limits of
 <code>dplyr</code> and thinking about how to do this in base R is
@@ -477,7 +494,7 @@ jumping off point for iteration, starting with the idea of the
 the same thing). So we want a way to subset the <code>dat</code>
 data.frame by country, and then calculate mean <code>lifeExp</code>.</p>
 <p>To start, we need to get a vector of the countries in the data.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>countries <span class="ot">&lt;-</span> <span class="fu">unique</span>(dat<span class="sc">$</span>country)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>countries <span class="ot">&lt;-</span> <span class="fu">unique</span>(dat<span class="sc">$</span>country)</span></code></pre></div>
 <p>Then we need to get the overall structure of the loop in place. To do
 this, we use the structure <code>for(i in range){ do something}</code>.
 Essentially, we need to first define the range of what we want the loop
@@ -488,9 +505,9 @@ one of the values in <code>range</code>, do something considering that,
 and then set <code>i</code> to the next value. This sequential process
 means that at the end of the loop, we will have cycled through all the
 entries in <code>range</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> countries){</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="fu">print</span>(i)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> countries){</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">print</span>(i)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## [1] &quot;Afghanistan&quot;
 ## [1] &quot;Albania&quot;
 ## [1] &quot;Algeria&quot;
@@ -643,16 +660,16 @@ the <code>i</code> iterator as a stand-in for each of the country names.
 But this does not actually do anything with the data, such that
 <code>tmp</code> will just be the subset data for the last country in
 the <code>countries</code> vector.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> countries){</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> i), ]</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> countries){</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> i), ]</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>}</span></code></pre></div>
 <p>So let’s now compute the mean <code>lifeExp</code> for each
 country.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>meanLifeExp <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> countries){</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> i), ]</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  meanLifeExp <span class="ot">&lt;-</span> <span class="fu">c</span>(meanLifeExp, <span class="fu">mean</span>(tmp<span class="sc">$</span>lifeExp))</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>meanLifeExp <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> countries){</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> i), ]</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  meanLifeExp <span class="ot">&lt;-</span> <span class="fu">c</span>(meanLifeExp, <span class="fu">mean</span>(tmp<span class="sc">$</span>lifeExp))</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>}</span></code></pre></div>
 <p>Here, we first create a vector to hold the output data
 (<code>meanLifeExp</code>) and then append the value for each mean onto
 the vector. That is, we essentially re-write the
@@ -663,11 +680,11 @@ etc.). So how can we get around doing this? <code>for</code> loops can
 be handed a vector of character values (as we have done above) or they
 can be handed a numeric range. This is often useful, as it eases
 indexing and can be a bit clearer in the code.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>meanLifeExp <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(countries)){</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> countries[i]), ]</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  meanLifeExp[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(tmp<span class="sc">$</span>lifeExp)</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>meanLifeExp <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(countries)){</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> countries[i]), ]</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  meanLifeExp[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(tmp<span class="sc">$</span>lifeExp)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>}</span></code></pre></div>
 <p>And the results of this code should be the same as the other
 <code>for</code> loop. We now have a vector of mean life expectancy
 values for each country in <code>countries</code>. But that was a fair
@@ -685,38 +702,38 @@ linear structure between the two variables) or Spearman’s rank
 correlation (assumes monotonic, but not linear response). The output of
 <code>cor.test</code> is a object, such that
 <code>dplyr::summarise</code> would fail.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="fu">cor.test</span>(year, lifeExp))</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="fu">cor.test</span>(year, lifeExp))</span></code></pre></div>
 <p>So summarise expects the output to be a vector (note that there are
 ways around this, by pulling out the information we want from the
 cor.test)</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="fu">cor.test</span>(year, lifeExp)<span class="sc">$</span>estimate)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="fu">cor.test</span>(year, lifeExp)<span class="sc">$</span>estimate)</span></code></pre></div>
 <p>But how we do pull out multiple values from the same test? And how do
 we handle and diagnose potential errors when we don’t work through each
 test sequentially?</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>lifeExpTime <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">ncol=</span><span class="dv">4</span>, <span class="at">nrow=</span><span class="fu">length</span>(countries))</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(countries)){</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> countries[i]), ]</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  crP <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(tmp<span class="sc">$</span>year, tmp<span class="sc">$</span>lifeExp)</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  crS <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(tmp<span class="sc">$</span>year, tmp<span class="sc">$</span>lifeExp, <span class="at">method=</span><span class="st">&#39;spearman&#39;</span>)</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  lifeExpTime[i, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(crP<span class="sc">$</span>estimate, crP<span class="sc">$</span>p.value, </span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>    crS<span class="sc">$</span>estimate, crS<span class="sc">$</span>p.value)</span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>lifeExpTime <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">ncol=</span><span class="dv">4</span>, <span class="at">nrow=</span><span class="fu">length</span>(countries))</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(countries)){</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> dat[<span class="fu">which</span>(dat<span class="sc">$</span>country <span class="sc">==</span> countries[i]), ]</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  crP <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(tmp<span class="sc">$</span>year, tmp<span class="sc">$</span>lifeExp)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  crS <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(tmp<span class="sc">$</span>year, tmp<span class="sc">$</span>lifeExp, <span class="at">method=</span><span class="st">&#39;spearman&#39;</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  lifeExpTime[i, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(crP<span class="sc">$</span>estimate, crP<span class="sc">$</span>p.value, </span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>    crS<span class="sc">$</span>estimate, crS<span class="sc">$</span>p.value)</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Warning in cor.test.default(tmp$year, tmp$lifeExp, method = &quot;spearman&quot;): Cannot
 ## compute exact p-value with ties</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">colnames</span>(lifeExpTime) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;pearsonEst&#39;</span>, <span class="st">&#39;pearsonP&#39;</span>, </span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="st">&#39;spearmanEst&#39;</span>, <span class="st">&#39;spearmanP&#39;</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>lifeExpTime <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(lifeExpTime)</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>lifeExpTime<span class="sc">$</span>country <span class="ot">&lt;-</span> countries </span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">colnames</span>(lifeExpTime) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;pearsonEst&#39;</span>, <span class="st">&#39;pearsonP&#39;</span>, </span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>  <span class="st">&#39;spearmanEst&#39;</span>, <span class="st">&#39;spearmanP&#39;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>lifeExpTime <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(lifeExpTime)</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>lifeExpTime<span class="sc">$</span>country <span class="ot">&lt;-</span> countries </span></code></pre></div>
 <p>And we can explore these data, to determine which countries have
 increasing or decreasing life expectancy values as a function of
 time.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>lifeExpTime[<span class="fu">which.min</span>(lifeExpTime<span class="sc">$</span>pearsonEst),]</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>lifeExpTime[<span class="fu">which.min</span>(lifeExpTime<span class="sc">$</span>pearsonEst),]</span></code></pre></div>
 <pre><code>##     pearsonEst  pearsonP spearmanEst spearmanP country
 ## 141 -0.2446149 0.4435318  -0.1888112 0.5578278  Zambia</code></pre>
 <p>This may seem like a lot of work when we could have done a bit less
@@ -731,22 +748,116 @@ not keep things all contained in the <code>for</code> loop.</p>
 numbers in which each number is the sum of the two preceding numbers in
 the vector. For the example, we will limit the length of the vector to
 be length 1000.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>fib <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">1000</span>){</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>  fib[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(fib[(i<span class="dv">-2</span>)<span class="sc">:</span>(i<span class="dv">-1</span>)])</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>fib <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">1000</span>){</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>  fib[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(fib[(i<span class="dv">-2</span>)<span class="sc">:</span>(i<span class="dv">-1</span>)])</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>}</span></code></pre></div>
 <p>And now we have a Fibonacci sequence starting with
 <code>c(0,1)</code>.</p>
 <blockquote>
 <p>Why do I start the <code>for</code> loop above at 3, and how else
 could you approach this same problem (there are many ways)?</p>
 </blockquote>
+</div>
+<div id="apply-statements" class="section level3">
+<h3>Apply statements</h3>
+<p><code>apply</code> statements exist in many types, depending on the
+data.structure you wish to do the action on: e.g. <code>apply</code>,
+<code>sapply</code>, <code>lapply</code>, <code>vapply</code>,
+<code>tapply</code>. We will focus on <code>apply</code> and
+<code>lapply</code>, but realize that these other options may be better
+suited for your use case (especially <code>vapply</code>, which gives
+you a bit more control over output format). In the loop above, we wanted
+to find the mean of each entry in a list. We used a <code>for</code>
+loop to loop over elements, and stored the resulting means in a vector
+called <code>out</code>. Instead, we could use <code>lapply</code>…the
+<code>l</code> in it means it performs some action on a list object.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">lapply</span>(<span class="at">X=</span>testList2, <span class="at">FUN=</span>mean)</span></code></pre></div>
+<pre><code>## $a
+## [1] 0.5149336
+## 
+## $b
+## [1] 0.7264648
+## 
+## $d
+## [1] 0.5308854</code></pre>
+<p>The output of <code>lapply</code> will always be a list, which is
+nice in some instances and not nice in others. <code>sapply</code> is a
+wrapper for <code>lapply</code> which always returns a vector of
+values.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="fu">sapply</span>(<span class="at">X=</span>testList2, <span class="at">FUN=</span>mean)</span></code></pre></div>
+<pre><code>##         a         b         d 
+## 0.5149336 0.7264648 0.5308854</code></pre>
+<p>Now that we have an idea of what the <code>apply</code> family of
+functions do, we can look specifically at <code>apply</code>, which
+operates on matrices or data.frames. What if we wanted to calculate the
+mean of every column or row in a data.frame? We could loop over each
+column or row…</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>testDF <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">a=</span><span class="fu">runif</span>(<span class="dv">100</span>), <span class="at">b=</span><span class="fu">rpois</span>(<span class="dv">100</span>,<span class="dv">2</span>), <span class="at">d=</span><span class="fu">rbinom</span>(<span class="dv">100</span>,<span class="dv">1</span>,<span class="fl">0.5</span>))</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a><span class="co"># over columns</span></span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>ret <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(testDF)){</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>    ret[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(testDF[,i])</span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>}</span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a><span class="co"># over rows</span></span>
+<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a>ret <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(testDF)){</span>
+<span id="cb26-14"><a href="#cb26-14" tabindex="-1"></a>    ret[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">unlist</span>(testDF[i, ]))</span>
+<span id="cb26-15"><a href="#cb26-15" tabindex="-1"></a>}</span></code></pre></div>
+<p>Or we could use apply statements</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">apply</span>(<span class="at">X=</span>testDF, <span class="at">MARGIN=</span><span class="dv">2</span>, <span class="at">FUN=</span>mean)</span></code></pre></div>
+<pre><code>##        a        b        d 
+## 0.469083 2.000000 0.490000</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">apply</span>(<span class="at">X=</span>testDF, <span class="at">MARGIN=</span><span class="dv">1</span>, <span class="at">FUN=</span>mean)</span></code></pre></div>
+<pre><code>##   [1] 1.12152229 1.49631144 0.73707709 1.68469032 1.26639734 0.82555550
+##   [7] 0.87387685 1.19143617 0.71481739 2.35170235 0.38762291 0.70784483
+##  [13] 0.79960014 0.80506469 2.79985396 0.93868430 1.03796539 0.85367128
+##  [19] 0.97654511 0.00320723 1.48774981 1.47519670 0.96997310 0.84182996
+##  [25] 1.49191477 0.58143265 1.03971350 0.42935628 0.90874980 0.62243689
+##  [31] 0.65866024 1.35179540 1.71779201 0.79101765 1.30958502 0.81788804
+##  [37] 0.80596578 0.77268310 0.43195416 0.42865734 1.00974948 0.52750960
+##  [43] 0.73019151 0.27450089 1.27699876 1.04488856 1.92626858 1.08529232
+##  [49] 1.25809380 0.90327604 1.08262631 1.34647928 1.72408794 0.57147791
+##  [55] 0.44251309 0.66276009 1.95583199 1.68507013 1.05234152 0.38790862
+##  [61] 0.71660575 0.48574734 1.25181866 0.70360726 0.66633188 0.84078321
+##  [67] 1.36613855 1.23309436 0.47210247 1.40138343 0.84533758 0.93075785
+##  [73] 0.46337942 0.86157207 0.69433379 1.07107694 0.22762355 1.26310464
+##  [79] 0.28622747 1.83946655 0.60442356 0.90493334 1.63832061 1.28150308
+##  [85] 0.58820865 1.36576519 0.60564570 2.17036041 2.76127076 1.04491107
+##  [91] 1.30175586 0.56756594 0.01324793 0.36053165 0.39450862 1.31327433
+##  [97] 1.22232270 0.63959893 0.66841202 0.11338135</code></pre>
+<p>One advantage is that indexing rows of a data.frame is a pain, which
+is why we had to <code>unlist</code> each row in the for loop over rows
+above. If we do not do this, we get a vector of NA values. This is
+because a data.frame is a list of vectors. This is why column-wise
+operations on data.frames can also be performed using
+<code>lapply</code> (if we wanted list output) or <code>sapply</code>
+(if we wanted vector output).</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="fu">lapply</span>(<span class="at">X=</span>testDF, <span class="at">FUN=</span>mean)</span></code></pre></div>
+<pre><code>## $a
+## [1] 0.469083
+## 
+## $b
+## [1] 2
+## 
+## $d
+## [1] 0.49</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="fu">sapply</span>(<span class="at">X=</span>testDF, <span class="at">FUN=</span>mean)</span></code></pre></div>
+<pre><code>##        a        b        d 
+## 0.469083 2.000000 0.490000</code></pre>
+</div>
+<div id="a-fun-class-exercise" class="section level2">
+<h2>A fun class exercise</h2>
 <p>You are creating a game of rock-paper-scissors. In the game, each
 player can select their strategy, and the strategy can be different in
 each trial (where there can be 100s of trials).</p>
 <p>I think that the outcome is random, so as a player, I already have
 decided what I’m going to play before the game starts.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>strat <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&#39;rock&#39;</span>,<span class="st">&#39;paper&#39;</span>, <span class="st">&#39;scissors&#39;</span>), <span class="dv">100</span>, <span class="at">replace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a>strat <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&#39;rock&#39;</span>,<span class="st">&#39;paper&#39;</span>, <span class="st">&#39;scissors&#39;</span>), <span class="dv">100</span>, <span class="at">replace=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Write a for loop to simulate rock-paper-scissors game of 500 trials
 between two players, where my strategy above is one of the players.</p>
 <p>How would you go about changing the strategy of the other player to
@@ -758,14 +869,14 @@ code?</p>
 </div>
 <div id="sessioninfo" class="section level2">
 <h2>sessionInfo</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
-<pre><code>## R version 4.3.0 (2023-04-21)
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<pre><code>## R version 4.3.1 (2023-06-16)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 22.04.2 LTS
+## Running under: Ubuntu 22.04.3 LTS
 ## 
 ## Matrix products: default
-## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
-## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0
+## BLAS:   /usr/lib/x86_64-linux-gnu/atlas/libblas.so.3.10.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3;  LAPACK version 3.10.0
 ## 
 ## locale:
 ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -782,27 +893,17 @@ code?</p>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] geodata_0.5-8  terra_1.7-29   maps_3.4.1     gbm_2.1.8.1    igraph_1.4.3  
-##  [6] dplyr_1.1.2    plyr_1.8.8     DBI_1.1.3      rgbif_3.7.7    jsonlite_1.8.5
-## [11] httr_1.4.6     rmarkdown_2.11 fastmap_1.1.1 
+## [1] dplyr_1.1.2 plyr_1.8.8 
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] gtable_0.3.3      xfun_0.29         ggplot2_3.4.2     lattice_0.21-8   
-##  [5] vctrs_0.6.2       tools_4.3.0       generics_0.1.2    parallel_4.3.0   
-##  [9] curl_4.3.3        tibble_3.2.1      fansi_1.0.2       RSQLite_2.3.1    
-## [13] highr_0.9         blob_1.2.4        pkgconfig_2.0.3   Matrix_1.5-1     
-## [17] data.table_1.14.6 dbplyr_2.3.2      lifecycle_1.0.3   compiler_4.3.0   
-## [21] stringr_1.5.0     munsell_0.5.0     codetools_0.2-19  htmltools_0.5.2  
-## [25] yaml_2.3.6        lazyeval_0.2.2    pillar_1.9.0      jquerylib_0.1.4  
-## [29] whisker_0.4.1     cachem_1.0.8      viridis_0.6.3     tidyselect_1.2.0 
-## [33] digest_0.6.31     stringi_1.7.12    purrr_1.0.1       splines_4.3.0    
-## [37] grid_4.3.0        colorspace_2.1-0  cli_3.6.1         magrittr_2.0.2   
-## [41] triebeard_0.4.1   survival_3.5-3    crul_1.4.0        utf8_1.2.2       
-## [45] withr_2.5.0       scales_1.2.1      bit64_4.0.5       oai_0.4.0        
-## [49] bit_4.0.5         gridExtra_2.3     memoise_2.0.1     evaluate_0.15    
-## [53] knitr_1.37        viridisLite_0.4.2 rlang_1.1.1       urltools_1.7.3   
-## [57] Rcpp_1.0.10       glue_1.6.2        httpcode_0.3.0    xml2_1.3.4       
-## [61] R6_2.5.1</code></pre>
+##  [1] vctrs_0.6.3      cli_3.6.1        knitr_1.43       rlang_1.1.1     
+##  [5] xfun_0.39        generics_0.1.3   jsonlite_1.8.7   glue_1.6.2      
+##  [9] htmltools_0.5.5  tinytex_0.45     sass_0.4.7       fansi_1.0.4     
+## [13] rmarkdown_2.23   evaluate_0.21    jquerylib_0.1.4  tibble_3.2.1    
+## [17] fastmap_1.1.1    yaml_2.3.7       lifecycle_1.0.3  compiler_4.3.1  
+## [21] pkgconfig_2.0.3  Rcpp_1.0.11      digest_0.6.33    R6_2.5.1        
+## [25] tidyselect_1.2.0 utf8_1.2.3       pillar_1.9.0     magrittr_2.0.3  
+## [29] bslib_0.5.0      tools_4.3.1      cachem_1.0.8</code></pre>
 </div>
 
 
