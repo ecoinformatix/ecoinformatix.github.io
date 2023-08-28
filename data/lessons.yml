@@ -124,35 +124,21 @@ lessons:
     reading: "read/model"
     code: "code/model"
 
-  - module: ""
-    date: "Winter break"
-    datatype: "---"
-    topics: " --- "
-
   - module: "<i class='material-icons'>my_location</i>"  
-    date: "Week 13"
+    date: "Week 12"
     datatype: '<i class="fa fa-map-o"></i>'
     topics: "Making informed models + model performance"
     reading: "read/performance"
     code: "code/performance"
-    homework: "https://classroom.github.com/a/okgyNtNK" 
-
-
-
-
-
-
-
-
-
+    
 
   - module: "<i class='fa fa-lg fa-code'></i>"
-    date: "Week 14"
+    date: "Week 13"
     datatype: '<i class="material-icons">face</i>'
     topics: "Making your code readable, clean, and reproducible"
     reading: "read/style"
     code: "code/style"
-
+    homework: "https://classroom.github.com/a/okgyNtNK" 
 
 
   - module: " "
@@ -160,10 +146,7 @@ lessons:
     topics: "<b>FINAL PROJECTS</b>"
 
   - module: "<i class='material-icons'>school</i>"
-    date: "Week 15"  
+    date: "Week 14"  
     topics: "Final Project presentations" 
     
-  - module: "<i class='material-icons'>school</i>"
-    date: "Week 16"
-    topics: "Final Projects DUE"
    

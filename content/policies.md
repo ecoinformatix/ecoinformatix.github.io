@@ -5,6 +5,13 @@ markup: "goldmark"
 ---
 
 
+
+#### Instructor | [Tad Dallas](https://taddallas.github.io)  
+#### Location   |   Jones 101
+#### Times      |  T & TH 2:50pm - 4:05pm     
+#### Drop-in hours |  Th from 1:00pm - 2:40pm  
+
+
 ## Prerequisites
 
 You should be generally numerically literate, and some prior programming experience will be helpful. Students new to programming might find [Hands on Programming with R](http://amzn.com/1449359019) to be helpful. Students with significant experience in programming and statistical analysis should find themselves well prepared but should find plenty still to learn in each lesson.
@@ -116,6 +123,18 @@ Graduate students: think of this as something you would feel comfortable present
 
 
 
+## Important dates:
+
+Sept 21: first homework due
+Sept 28: final project proposal due 
+October 12: second homework due 
+November 9: third homework due 
+December 7: fourth homework due 
+
+Last day of classes is December 8, reading dat is Dec 9. 
+
+Present final project during final exam period: 
+> Thursday, December 14 - 4:00 p.m.
 
 
 

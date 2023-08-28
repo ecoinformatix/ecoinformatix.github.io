@@ -12,7 +12,17 @@
       <pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>/syllabus/</guid>
-      <description> Syllabus    Date Module Topics Read Code Homework   Week 1 home Course design, goals, introduction, and setup         MODULE 1: an introduction to computing in R       Week 2   git/GitHub      Week 3  An introduction to R and R markdown      Week 4  Visualization basics          MODULE 2: host-virus associations       Week 5 bug_report An intro to VIRION and strings      Week 6 bug_report Data manipulation (base + plyr/dplyr)         MODULE 3: ecological simulation       Week 7  Loops and apply      Week 8  `List` objects      Week 9  Probabilistic processes         MODULE 4: making and evaluating models       Week 10 my_location Working with APIs      Week 11 my_location Statistical modeling      Winter break  ---       Week 13 my_location Making informed models + model performance      Week 14  Making your code readable, clean, and reproducible         FINAL PROJECTS      Week 15 school Final Project presentations      Week 16 school Final Projects DUE        </description>
+      <description> Syllabus    Date Module Topics Read Code Homework   Week 1 home Course design, goals, introduction, and setup         MODULE 1: an introduction to computing in R       Week 2   git/GitHub      Week 3  An introduction to R and R markdown      Week 4  Visualization basics          MODULE 2: host-virus associations       Week 5 bug_report An intro to VIRION and strings      Week 6 bug_report Data manipulation (base + plyr/dplyr)         MODULE 3: ecological simulation       Week 7  Loops and apply      Week 8  `List` objects      Week 9  Probabilistic processes         MODULE 4: making and evaluating models       Week 10 my_location Working with APIs      Week 11 my_location Statistical modeling      Week 12 my_location Making informed models + model performance      Week 13  Making your code readable, clean, and reproducible         FINAL PROJECTS      Week 14 school Final Project presentations        </description>
+    </item>
+    
+    <item>
+      <title>An introduction to R and R markdown</title>
+      <link>/code/basics/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/code/basics/</guid>
+      <description>What is R and why should I use it? R is a statistical programming language that has quickly become the standard language for ecologists, and to some extent, biologists. This does not mean that you have to use it. I hope that many of the skills you learn in this course in terms of how to program are transferable across languages.
+ R basics Variables Variables are defined as objects in R that can take on different attributes.</description>
     </item>
     
     <item>
@@ -92,8 +102,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/policies/</guid>
-      <description>Prerequisites You should be generally numerically literate, and some prior programming experience will be helpful. Students new to programming might find Hands on Programming with R to be helpful. Students with significant experience in programming and statistical analysis should find themselves well prepared but should find plenty still to learn in each lesson.
-Instructional Methods The majority of the course will be taught as live-coding demonstrations, where students are encouraged to follow along on their own machines.</description>
+      <description>Instructor | Tad Dallas Location | Jones 101 Times | T &amp;amp; TH 2:50pm - 4:05pm Drop-in hours | Th from 1:00pm - 2:40pm Prerequisites You should be generally numerically literate, and some prior programming experience will be helpful. Students new to programming might find Hands on Programming with R to be helpful. Students with significant experience in programming and statistical analysis should find themselves well prepared but should find plenty still to learn in each lesson.</description>
     </item>
     
     <item>
