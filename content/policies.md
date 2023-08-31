@@ -125,16 +125,19 @@ Graduate students: think of this as something you would feel comfortable present
 
 ## Important dates:
 
-Sept 21: first homework due
-Sept 28: final project proposal due 
-October 12: second homework due 
-November 9: third homework due 
-December 7: fourth homework due 
+Date |  Event
+:-----------|-----:
+Sept 21 |first homework due 
+Sept 28 | final project proposal due 
+October 12 | second homework due 
+November 9 | third homework due 
+December 7 | fourth homework due 
 
-Last day of classes is December 8, reading dat is Dec 9. 
 
-Present final project during final exam period: 
-> Thursday, December 14 - 4:00 p.m.
+
+_Last day of classes is December 8, reading dat is Dec 9_
+
+Present final project during final exam period: **Thursday, December 14 - 4:00 p.m.**
 
 
 
