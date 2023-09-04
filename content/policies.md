@@ -107,6 +107,7 @@ Please create your proposal in a markdown file called `proposal.md` in the root 
 
 
 
+
 **Project development**
 You will develop the project throughout the semester, using tools and approaches that you learn during the course. Do this early and consistently. I will be able to track your progress on GitHub, meaning that I expect to see continued development on the project and not a last minute flurry of commits. 
 
@@ -118,6 +119,56 @@ Graduate students: this is an opportunity to push forward your research. Ideally
 You will present your final project as a 15 minute presentation at the end of the semester. It should provide context and information about the 'what, why, and how' of your research question, and go through your findings, preferably demonstrating your ability to visualize data. 
 
 Graduate students: think of this as something you would feel comfortable presenting at an academic conference. 
+
+
+
+
+**Project ideas and data sources**:
+
+There are plenty of data sources and questions that could be used for the final project. Below are some data sources and some general questions that could be addressed. 
+
+_Data_: 
+
+[Global Mammal Parasite Database](https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.1799)
+
+[London Natural History Museum helminth database](https://www.nhm.ac.uk/research-curation/scientific-resources/taxonomy-systematics/host-parasites/) accessible through R using the [helminthR](https://cran.r-project.org/web/packages/helminthR/index.html) R package.
+
+[Zooplankton community data](http://zooplankton.ecology.uga.edu/)
+
+[Small mammal communities as part of the Portal project](https://portal.weecology.org/)
+
+[Zooplankton and water quality data across US](https://archive.epa.gov/emap/archive-emap/web/html/els.html)
+
+[Global Biodiversity Information Facility](https://www.gbif.org/) many many occurrence records for species, accessible from R through [rgbif](https://cran.r-project.org/web/packages/rgbif/index.html)
+
+[Phylogenies, range and trait data](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.2443#support-information-section)
+
+[Ecological data wiki](https://ecologicaldata.org/find-data) has lots of data. 
+
+[MoveBank](https://www.movebank.org/cms/webapp?gwt_fragment=page=search_map) individual tracking data 
+
+
+_Questions_: 
+
+Ideally, whatever question you choose will allow you to showcase your new R skillset. Feel free to use multiple data sources in concert to address your question. You also could simulate data if you were so inclined, but this would be a challenge. Some questions that could be addressed are below, but this will be driven by your interests. I would recommend going to Google Scholar and searching some keywords that align with your interests. Based on the questions below, a query that matches my interests would be something like "community change across environmental gradients" or "host-parasite specificity" or "parasite species richness". If you find yourself struggling to identify a good question or dataset, come to drop-in hours or send me an email and we can figure it out. 
+
++ What variables are associated with species geographic range size (e.g., latitude of range centroid, environmental variables, species traits)? 
+
++ What controls the number of parasite species a host species is infected by? What controls the number of host species that a parasite can infect? 
+
++ How do communities change across geographic or environmental gradients? 
+
++ How does individual home range scale to species geographic ranges (i.e., are species with larger home ranges also those that have larger total geographic range)? 
+
++ How does species richness change over time at a given site? 
+
+
+
+
+
+
+
+
 
 
 
