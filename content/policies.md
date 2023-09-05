@@ -95,6 +95,9 @@ The final project will consist of 3 parts. First, you will develop a project pro
 
 This means that I will expect not only a well-written and clear manuscript, but also documentation to easily reproduce all analyses, figures, and compile manuscript text.
 
+**You will be using [this template](https://classroom.github.com/a/391LMC59) for your final project, to keep everything organized**
+
+
 **Final project proposal**
 Please prepare a short proposal on your final project idea by the end of the first course module. The proposal should include:
 
@@ -179,7 +182,7 @@ Ideally, whatever question you choose will allow you to showcase your new R skil
 Date |  Event
 :-----------|-----:
 Sept 21 |first homework due 
-Sept 28 | final project proposal due 
+Sept 28 | final project proposal due; [use this template](https://classroom.github.com/a/391LMC59)
 October 12 | second homework due 
 November 9 | third homework due 
 December 7 | fourth homework due 
