@@ -184,9 +184,8 @@ Date |  Event
 Sept 21 |first homework due 
 Sept 28 | final project proposal due; [use this template](https://classroom.github.com/a/391LMC59)
 October 12 | second homework due 
-November 9 | third homework due 
+November 2 | third homework due 
 December 7 | fourth homework due 
-
 
 
 _Last day of classes is December 8, reading dat is Dec 9_

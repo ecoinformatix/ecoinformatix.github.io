@@ -30,7 +30,7 @@ Lists in R are collections of objects that can be of any mix of types (or all th
 
 ```{r}
 
-lst <- list(runif(100), data.frame(x=runif(100), y=runif(100)), letters[1:10], 'a')
+lst <- list(a=runif(100), df=data.frame(x=runif(100), y=runif(100)), letters[1:10], 'a')
 
 # index single list elements
 lst[[1]]
@@ -135,12 +135,20 @@ Neat, right?
 But back to lists. Let's work through the rest of working with lists through some exercises. Given the simulations above (`sims` list) ...
 
 
+
+
+
 Calculate the mean number of infected individuals for each simulation
 
 ```{r}
 
 
 ```
+
+
+
+
+
 
 Find the time associated with the maximum number of infected nodes 
 
@@ -149,6 +157,11 @@ Find the time associated with the maximum number of infected nodes
 
 
 ```
+
+
+
+
+
 
 
 Calculate the fraction of all simulations in which fewer than 5 nodes are infected
@@ -248,6 +261,13 @@ What is the mean duration (the total time the epidemic took before it stopped) a
 
 
 
+
+
+
+
+
+
+
 ## plyr apply functionality tweaks 
 
 `XYply` statements as nice wrappers to more classic `apply` statements. Here, `X` and `Y` can take values of 'a', 'l', or 'd', depending on the input or output data structure desired. For instance, if we have a list that we would like to apply over and return a data.frame, we would use `ldply`, where the `l` is claiming that the input is a list object, and the `d` is claiming that the output should be formatted as a data.frame. Other examples of this syntax would be `adply`, `ddply`, `laply`, `aaply`, etc. etc.
@@ -277,7 +297,7 @@ plyr::aaply(arr, 1, sum)
 
 ```
 
-We can change one letter and now return a data.frame containing two columns. This is also a good time to point out the flexibility of the XYply statements to different margins. Margins (denoted as `.margins` argument in `R`, asks along which axis you would like to operate on the array. If we set .margins=1, this corresponds to a row-wise operation, so we calculate the sum across the array for Curly, Larry, and Moe. If we change this to .margins=2, we operate on columns, and will return sums for Groucho, Harpo, and Zeppo. And if we use .margins=3, we will return sums for Bart, Lisa, and Maggie. 
+We can change one letter and now return a data.frame containing two columns. This is also a good time to point out the flexibility of the XYply statements to different margins. Margins (denoted as `.margins` argument in `R`, asks along which axis you would like to operate on the array). If we set .margins=1, this corresponds to a row-wise operation, so we calculate the sum across the array for Curly, Larry, and Moe. If we change this to .margins=2, we operate on columns, and will return sums for Groucho, Harpo, and Zeppo. And if we use .margins=3, we will return sums for Bart, Lisa, and Maggie. 
 
 
 ```{r}

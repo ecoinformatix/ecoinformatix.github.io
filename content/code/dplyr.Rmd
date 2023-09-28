@@ -1,8 +1,9 @@
 ---
 title: "Data manipulation and cleaning"
 author: Tad Dallas
-date: 
-output: pdf_document
+output: 
+  html_document: 
+    code_folding: show
 ---
 
 
@@ -463,6 +464,155 @@ The results of these two are identical (`all(tmp3==tmp2)` returns TRUE).
 This is useful, as commands can be chained together, including the creation of new variables, subsetting and summarising of existing variables, etc. One thing to keep in mind is to check intermediate results -- instead of just piping all the way through -- as data manipulation errors can be introduced mid-statement and go unnoticed. That is, in some situations, piping may not be the best solution to your problem, and working through each step of the pipe is incredibly useful to ensure that nothing funky is going on. 
 
 
+
+
+### Practice problems 
+
+
+We'll still work with the gapminder data, so no worries about reloading it if it's already in your workspace. 
+
+```{r}
+dat <- read.delim(file = "http://www.stat.ubc.ca/~jenny/notOcto/STAT545A/examples/gapminder/data/gapminderDataFiveYear.txt")
+
+```
+
+
+
+
+
+
+Calculate the number of countries in each continent
+
+```{r class.source = 'fold-hide'}
+
+table(dat$continent) / 12
+
+unConts <- unique(dat$continent)
+contCount <- c()
+for(i in 1:length(unConts)){
+	contCount[i] <- length(unique(dat$country[which(dat$continent == unConts[i])]))
+}
+
+rowSums(table(dat$continent, dat$country)>0)
+
+df <- dat |> 
+	group_by(continent) |> 
+	summarise(countries=length(unique(country)))
+
+
+```
+
+
+
+Create a new data.frame which removes any countries that start with the letter 'c'
+
+```{r class.source = 'fold-hide'}
+
+df <- dat[grepl('^C', dat$country) == FALSE, ]
+
+df <- dat[(startsWith(dat$country, 'C')==FALSE), ]
+
+
+
+```
+
+
+
+
+Create a new data.frame which removes any countries with country names longer than 8 characters 
+
+```{r class.source = 'fold-hide'}
+
+df <- dat[which(nchar(dat$country) < 8), ]
+
+```
+
+
+
+
+Write a function that uses dplyr to take the data and a country name, and outputs the mean and standard deviation of population size.
+
+```{r class.source = 'fold-hide'}
+
+getMeanSD <- function(dat,name='Togo'){
+	tmp <- dat[which(dat$country == name), ]
+	return(c(mean(tmp$pop), sd(tmp$pop)))
+}
+
+```
+
+
+
+
+
+Make a visualization to plot population size by year, where each line is a different country. 
+
+```{r class.source = 'fold-hide'}
+
+unCountries <- unique(dat$country)
+colz <- rainbow(length(unCountries))
+
+tmp <- dat[which(dat$country == unCountries[1]), ]
+plot(x=tmp$year, y=tmp$pop, log='y',
+	xlab='year', ylab='population size', 
+	pch=16, type='b', col=colz[1],
+	ylim=c(min(dat$pop), max(dat$pop)))
+
+for(i in 2:length(unCountries)){
+	tmp <- dat[which(dat$country == unCountries[i]), ]
+	lines(x=tmp$year, y=tmp$pop, type='b', col=colz[i])
+
+}
+
+
+# it's ugly, but the code is there. 
+
+```
+
+
+
+
+
+
+
+Load the `who` data from dplyr (`data(who)` after you call `library(dplyr)`).
+
+
+Get familiar with the data. Use joins on the data to make it so that you calculate the relationship (correlation) between positive pulmonary smear (sp) cases across all age groups and gdpPercap from the gapminder data for each country. 
+
+
+```{r class.source = 'fold-hide'}
+library(plyr)
+library(dplyr)
+library(tidyr) 
+
+data(who)
+
+spCounts <- dplyr::select(who, grep('sp', colnames(who)))
+who$spCounts <- rowSums(spCounts, na.rm=TRUE)
+
+ret <- left_join(dat, who, by=c('country','year'))
+
+unConts <- unique(ret$country)
+curz <- c()
+for(i in 1:length(unConts)){
+	tmp <- ret[which(ret$country == unConts[i]), ]
+	curz[i] <- cor(tmp$spCounts, tmp$gdpPercap, use='pairwise.complete.obs')
+}
+
+
+
+
+
+
+# Ah, some of the data don't have enough information. So the dplyr approach below bonks on Bolivia. For loop above does not fall into that trap
+
+#ret |> 
+#	group_by(country) |>
+#	summarise(cor=cor(spCounts, gdpPercap, use='complete.obs'))
+
+
+```
 
 
 
