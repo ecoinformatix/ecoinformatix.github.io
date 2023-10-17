@@ -96,22 +96,80 @@ pnorm(0.25, mean=0, sd=1)
 qnorm(0.25, mean=0, sd=1)
 pnorm(-0.6744898, mean=0, sd=1)
 
+```
 
-par(mfrow=c(1,2))
-hist(rnorm(1000))
-abline(v=0.25, lwd=2)
-abline(v=-0.6744898, col='red', lwd=2)
-plot(ecdf(rnorm(1000)))
-abline(v=0.25, lwd=2)
-abline(v=-0.6744898, col='red', lwd=2)
+
+
+
+So this means that to the left of -0.6745, we should have 25% of the weight of the data, right? 
+
+```{r}
+
+colorArea <- function(from, to, density, ..., col="dodgerblue", dens=NULL){
+    y_seq <- seq(from, to, length.out=500)
+    d <- c(0, density(y_seq, ...), 0)
+    polygon(c(from, y_seq, to), d, col=col, density=dens)
+}
+
+curve(dnorm(x), from=-4, to=4, 
+  ylab = "Probability Density",
+  xlab = "My random normal variate")
+
+colorArea(from=-4, to=qnorm(0.25), dnorm)
 
 ```
 
-The last is `d----`, which we will go ahead and ignore for now, as the `r---`, `p----`, and `q----` variants tend to be a bit more useful for thinking about statistical testing. 
+
+```{r}
+
+curve(dnorm(x), from=-4, to=4, 
+  ylab = "Probability Density",
+  xlab = "My random normal variate")
+
+colorArea(from=-4, to=qnorm(0.5), dnorm)
+
+```
+
+
+
+So this means that if we take random draws from a distribution, we should be able to build up something that looks like the results of dnorm, right? But building a distribution from the random variates requires that we have enough samples to accurately capture the true underlying distribution. Let's explore this. 
+
+```{r}
+
+plot(density(rnorm(10, mean=0, sd=1)), col='firebrick', 
+  xlim=c(-4,4), ylim=c(0,0.4))
+curve(dnorm(x), from=-4, to=4, add=TRUE, lwd=2)
+
+plot(density(rnorm(1000, mean=0, sd=1)), col='firebrick', 
+  xlim=c(-4,4), ylim=c(0,0.4))
+curve(dnorm(x), from=-4, to=4, add=TRUE, lwd=2)
+
+plot(density(rnorm(100000, mean=0, sd=1)), col='firebrick', 
+  xlim=c(-4,4), ylim=c(0,0.4))
+curve(dnorm(x), from=-4, to=4, add=TRUE, lwd=2)
+
+```
+
+
+
+The above code uses the `d---` function, where the `d` stands for the density. This gives the expected density of values that would occur at a certain point given the probability distribution. The `d` here corresponds to the probability density function, so while `p---` gave us probabilities and `q---` gave us the area under the curve, `d---` gives us the actual value of the density function. 
+
+
+```{r}
+
+plot(density(rnorm(100000, mean=0, sd=1)), col='firebrick', 
+  xlim=c(-4,4), ylim=c(0,0.4))
+curve(dnorm(x), from=-4, to=4, add=TRUE, lwd=2)
+points(x=0, y=dnorm(0), pch=16, cex=3)
+points(x=1, y=dnorm(1), pch=16, cex=3)
+
+```
 
 
 
 But how does the above relate to statistical tests? We will explore this by considering an example of the t-test, but think about other statistical tests that may (and likely do) follow a similar structure in terms of how the test statistic is calculated and how we think about p-values. 
+
+
 
 
 
@@ -162,11 +220,11 @@ abline(v=tt, lwd=3)
 
 ### Two-sample
 
-X1-X2 / (sp)
+\[ \dfrac{X1-X2}{sp} \]
 
-sp = sqrt((varx1  + varx2) / 2)
+\[ sp = \dfrac{\sqrt{varx1  + varx2}}{2} \]
 
-sp is pooled variance
+where `sp` is pooled variance
 
 ```{r}
 
@@ -226,8 +284,110 @@ binom.test(sum(outcomes), n=100, p=0.5)
 
 pbinom(sum(outcomes), 100, 0.5) * 2
 
+```
+
+
+### Effect size
+
+One thing you may be thinking to yourself at this stage is that the outcomes of these functions seems pretty tied to the number of samples you have. You're right. We could observe a 'significant' result from 10 trials, like the probability of having 3 heads and 7 tails out of a sample of 10 is 
+
+```{r}
+
+pbinom(3, 10, 0.5)
 
 ```
+
+but the probability of having 30 heads and 70 tails is 
+
+```{r}
+
+pbinom(30, 100, 0.5)
+
+```
+
+
+But how much we 'trust' the outcome is not reported. One way of doing this is to calculate effect sizes. Cohen's $d$ is a pretty classic measure of effect size (though certainly others exist). And the best part is that it is pretty simple. In the case above, we could compute the effect size as 
+
+\[ d = \dfrac{\bar{X} - \mu_{0}}{\hat{\sigma}} \]
+
+or the mean of the sample minus the expected value divided by the standard deviation of the sample. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Some practice problems 
+
+You flip a fair coin 10 times. What is the probability that you will have 2 heads and 8 tails outcomes? 
+
+```{r}
+
+
+```
+
+
+
+An individual produces $n$ offspring per year following a Poisson distribution with lambda = 2. Calculate the probability that a mother has more than 5 offspring in a year.  
+
+```{r}
+
+1-dpois(5, 2)
+
+```
+
+
+
+How about the probability of having less than 2 offspring, 2 years in a row? (we may not do this one, as it gets us a bit further in probability territory where some are quite uncomfortable)
+
+```{r}
+
+
+```
+
+
+What's the probability of observing a sentence with fewer than 25 characters given the sentences data? 
+
+
+```{r}
+library(stringr)
+data(sentences)
+
+
+```
+
+
+What is the above solution assuming about the distribution of the number of characters per sentence from the `sentences` data?
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -375,6 +535,10 @@ plot(logisticPDynamics(10, b=0.1, d=0.1, mod=logisticP1, steps=100),
 ```
 
 
+
+
+
+
 ```{r results='hide'}
 
 # birth death equal
@@ -421,6 +585,9 @@ lapply(1:100, function(x){
 
 
 
+
+
+
 How would you incorporate the carrying capacity $k$ into the `logisticP2` function? Show how it influences population dynamics. 
 
 
@@ -430,6 +597,10 @@ How would you incorporate the carrying capacity $k$ into the `logisticP2` functi
 
 
 ```
+
+
+
+
 
 
 

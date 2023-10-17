@@ -278,6 +278,24 @@ Write a for loop to simulate rock-paper-scissors game of 500 trials between two 
 
 ```{r}
 
+newStrat <- c()
+for(i in 1:length(strat)){
+  newStrat[i] <- sample(c('rock','paper','scissors'),1)
+}
+
+# but this is just the same as above. And we need a way to score the result to see who won right? Let's do that now. Write a function that determines who wins each round (so the inputs would be something like x='rock',y='scissors', and it would output `y` or `2` to indicate the winner)
+
+
+getScore <- function(x,y){
+  xScore <- yScore <- c()
+  payoff <- matrix(c(0,1,0,0,0,1,1,0,0), ncol=3, byrow=TRUE)
+  colnames(payoff) <- rownames(payoff) <- c('rock', 'scissors', 'paper')
+  for(i in 1:length(x)){
+    xScore[i] <- payoff[which(rownames(payoff) == x[i]), which(colnames(payoff)==y[i])]
+    yScore[i] <- payoff[which(rownames(payoff) == y[i]), which(colnames(payoff)==x[i])]
+  }
+  return(c(x=sum(xScore), y=sum(yScore)))
+}
 
 ```
 
@@ -290,6 +308,70 @@ How would you go about changing the strategy of the other player to beat my stra
 ```{r}
 
 
+tadStrat <- function(opp){
+  opts <- c('rock', 'paper', 'scissors')
+  ret <- sample(opts, 1)
+  for(i in 2:length(opp)){
+    if(opp[i-1] == 'rock'){
+      ret[i] <- 'scissors'
+    }
+    if(opp[i-1] == 'paper'){
+      ret[i] <- 'rock'
+    }
+    if(opp[i-1] == 'scissors'){
+      ret[i] <- 'paper'
+    }
+  }
+  return(ret)
+}
+
+
+
+```
+
+
+
+Let's use apply/lapply/etc some more. Let's say that I do not allow you to see my strategy directly, but I do let you test any number of strategies against mine and use the best one. Write code to generate many different strategies and select the best one given my fixed strategy `strat`. 
+
+
+```{r}
+
+stratList <- lapply(1:100000, function(x){
+  strat <- sample(c('rock','paper', 'scissors'), 100, replace=TRUE)
+})
+
+stratOut <- lapply(stratList, function(x){
+  getScore(x, strat)
+})
+
+scoreDiff <- sapply(stratOut, function(x){x[1]-x[2]})
+stratOut[[which.max(scoreDiff)]]
+stratList[[which.max(scoreDiff)]]
+
+```
+
+
+What other way could we approach this problem? 
+
+```{r}
+
+
+# a bit obvious, but I can break down each play and test all 3 strategies, picking the one that works best. 
+
+ret <- c()
+for(i in 1:length(strat)){
+  if(getScore('rock', strat[i])[1] == 1){
+    ret[i] <- 'rock'
+  }
+  if(getScore('scissors', strat[i])[1] == 1){
+    ret[i] <- 'scissors'
+  }
+  if(getScore('paper', strat[i])[1] == 1){
+    ret[i] <- 'paper'
+  }
+}
+
+
 ```
 
 
@@ -300,6 +382,13 @@ How would you go about changing the strategy of the other player to beat my stra
 How would you modify your strategy to be adaptive? For instance, if your opponent selects 'rock' twice in a row, it may be unlikely that they'll select 'rock' again. How do you incorporate this into the code? 
 
 ```{r}
+tadStrat2 <- function(opp){
+  distro <- table(opp)
+  probz <- distro / sum(distro)
+  strat <- sample(c('rock', 'paper', 'scissors'), 
+    length(opp), replace=TRUE, prob=probz[c(3,1,2)])
+  return(strat)
+}
 
 
 ```
