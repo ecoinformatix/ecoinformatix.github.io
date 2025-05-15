@@ -1,0 +1,393 @@
+### What is iteration? 
+
+Iteration refers to the process of doing the same task to a bunch of different objects. Consider a toy example of the actions required by a cashier at a grocery store. They scan each item, where items can be different sizes/shapes/prices. This is an iterative task, as it uses the same motions (essentially) across a variety of different objects (groceries) which may vary in many ways, but have some commonalities (e.g., most items have a barcode). 
+
+
+
+### Why is iteration important? 
+
+Up until this point, we have dealt with single data.frame objects (or vectors, the building blocks of data.frames). However, we also introduced the concept of `lists` in one of the first lectures, and will go into more detail about lists soon. For now, we'll talk about iteration independent of list objects, but keep in mind that iteration is important for lists. 
+
+Essentially, iteration allows us to process a large amount of data without the need to repeat ourselves. Recall the gapminder data. 
+
+
+```{r}
+
+dat <- read.delim(file = "http://www.stat.ubc.ca/~jenny/notOcto/STAT545A/examples/gapminder/data/gapminderDataFiveYear.txt")
+
+```
+
+We discussed the `gapminder` data when introducing some tools around data subsetting and summarising. We ended that lecture by discussing `dplyr`, a useful package for data processing. 
+
+
+```{r}
+library(plyr)
+library(dplyr)
+
+```
+
+
+Recall that towards the end of that lecture, we introduce piping commands with `dplyr` to summarise data. For instance, the code below calculates mean life expectancy (`lifeExp`) by `country`.
+
+```{r}
+tmp3 <- dat |>
+	dplyr::group_by(country) |>
+	dplyr::summarise(mnLifeExp=mean(lifeExp))
+
+```
+
+Approaching this with `dplyr` offers us a powerful way to summarise our data, but you will inevitably hit the limits of `dplyr` and thinking about how to do this in base R is difficult, right? In base R, we discussed subsetting, but to do what the above code does, we would have to subset by every country and then calculate the mean `lifeExp` for each subset. This is a good jumping off point for iteration, starting with the idea of the `for` loop (some folks use 'looping' and 'iteration' to mean the same thing). So we want a way to subset the `dat` data.frame by country, and then calculate mean `lifeExp`. 
+
+To start, we need to get a vector of the countries in the data. 
+
+```{r}
+
+countries <- unique(dat$country)
+
+```
+
+Then we need to get the overall structure of the loop in place. To do this, we use the structure `for(i in range){ do something}`. Essentially, we need to first define the range of what we want the loop to do, and then within the curly brackets, we need to do the thing. The power of this comes from the `i` in the `for` loop call. This is essentially saying to temporally treat `i` as one of the values in `range`, do something considering that, and then set `i` to the next value. This sequential process means that at the end of the loop, we will have cycled through all the entries in `range`.
+
+```{r}
+
+for(i in countries){
+  print(i)
+}
+
+```
+
+> So what did the above code do? 
+
+
+Alright. So we have a way to sequentially work through all of the `countries` and we know how to subset the data based on country. So we can now subset the data for each of the countries, using the `i` iterator as a stand-in for each of the country names. But this does not actually do anything with the data, such that `tmp` will just be the subset data for the last country in the `countries` vector. 
+
+```{r}
+
+for(i in countries){
+  tmp <- dat[which(dat$country == i), ]
+}
+
+```
+
+
+So let's now compute the mean `lifeExp` for each country.
+
+
+```{r}
+
+meanLifeExp <- c()
+for(i in countries){
+  tmp <- dat[which(dat$country == i), ]
+  meanLifeExp <- c(meanLifeExp, mean(tmp$lifeExp))
+}
+
+```
+
+Here, we first create a vector to hold the output data (`meanLifeExp`) and then append the value for each mean onto the vector. That is, we essentially re-write the `meanLifeExp` vector at every step of the iteration. This is bad practice for a number of reasons (e.g., no memory efficient, writing over objects where the object itself is in the call is bad practice, etc.). So how can we get around doing this? `for` loops can be handed a vector of character values (as we have done above) or they can be handed a numeric range. This is often useful, as it eases indexing and can be a bit clearer in the code. 
+
+```{r}
+
+meanLifeExp <- c()
+for(i in 1:length(countries)){
+  tmp <- dat[which(dat$country == countries[i]), ]
+  meanLifeExp[i] <- mean(tmp$lifeExp)
+}
+
+```
+
+And the results of this code should be the same as the other `for` loop. We now have a vector of mean life expectancy values for each country in `countries`. But that was a fair bit of work to get the same thing we could have gotten with `dplyr`, right? Let's explore a situation where it would be a bit tougher to get the same thing out of `dplyr` (at least with our current knowledge, as the example I'll give below can be solved using `dplyr::do`). 
+
+Let's say that we want to explore the relationship between `year` and `lifeExp` for each country. That is, we want to know how life expectancy is changing over time across the different countries. To do this, we can use the `cor.test` function in R to calculate Pearson's correlation coefficients (assumes linear structure between the two variables) or Spearman's rank correlation (assumes monotonic, but not linear response). The output of `cor.test` is a object, such that `dplyr::summarise` would fail. 
+
+```{r, eval=FALSE }
+tmp3 <- dat |>
+	dplyr::group_by(country) |>
+	dplyr::summarise(cor.test(year, lifeExp))
+
+```
+
+So summarise expects the output to be a vector (note that there are ways around this, by pulling out the information we want from the cor.test)
+
+
+```{r}
+tmp3 <- dat |>
+	dplyr::group_by(country) |>
+	dplyr::summarise(cor.test(year, lifeExp)$estimate)
+
+```
+
+But how we do pull out multiple values from the same test? And how do we handle and diagnose potential errors when we don't work through each test sequentially? 
+
+```{r}
+
+lifeExpTime <- matrix(0, ncol=4, nrow=length(countries))
+
+for(i in 1:length(countries)){
+  tmp <- dat[which(dat$country == countries[i]), ]
+  crP <- cor.test(tmp$year, tmp$lifeExp)
+  crS <- cor.test(tmp$year, tmp$lifeExp, method='spearman')
+  lifeExpTime[i, ] <- c(crP$estimate, crP$p.value, 
+    crS$estimate, crS$p.value)
+}
+
+colnames(lifeExpTime) <- c('pearsonEst', 'pearsonP', 
+  'spearmanEst', 'spearmanP')
+
+lifeExpTime <- as.data.frame(lifeExpTime)
+lifeExpTime$country <- countries 
+
+```
+
+
+
+And we can explore these data, to determine which countries have increasing or decreasing life expectancy values as a function of time. 
+
+```{r}
+
+lifeExpTime[which.min(lifeExpTime$pearsonEst),]
+
+```
+
+
+This may seem like a lot of work when we could have done a bit less using `dplyr` syntax. The real power of `for` loops will be in working with lists, simulating data, and plotting. For instace, let's say we don't have data directly to work with, but want to generate data. We could generate a bunch of data, mash it all together in a data.frame, and then feed it into `dplyr`, the data generation step would require a `for` loop already, so why not keep things all contained in the `for` loop. 
+
+Let's say we want to create a Fibonacci sequence. This is a vector of numbers in which each number is the sum of the two preceding numbers in the vector. For the example, we will limit the length of the vector to be length 1000. 
+
+```{r}
+
+fib <- c(0,1)
+for(i in 3:1000){
+  fib[i] <- sum(fib[(i-2):(i-1)])
+}
+
+```
+
+And now we have a Fibonacci sequence starting with `c(0,1)`. 
+
+> Why do I start the `for` loop above at 3, and how else could you approach this same problem (there are many ways)? 
+
+
+
+
+
+
+
+
+### Apply statements
+
+`apply` statements exist in many types, depending on the data.structure you wish to do the action on: e.g. `apply`, `sapply`, `lapply`, `vapply`, `tapply`. We will focus on `apply` and `lapply`, but realize that these other options may be better suited for your use case (especially `vapply`, which gives you a bit more control over output format). In the loop above, we wanted to find the mean of each entry in a list. We used a `for` loop to loop over elements, and stored the resulting means in a vector called `out`. Instead, we could use `lapply`...the `l` in it means it performs some action on a list object. 
+
+
+```{r}
+lapply(X=testList2, FUN=mean)
+```
+
+The output of `lapply` will always be a list, which is nice in some instances and not nice in others. `sapply` is a wrapper for `lapply` which always returns a vector of values.
+
+
+```{r}
+sapply(X=testList2, FUN=mean)
+```
+
+
+Now that we have an idea of what the `apply` family of functions do, we can look specifically at `apply`, which operates on matrices or data.frames. What if we wanted to calculate the mean of every column or row in a data.frame? We could loop over each column or row...
+
+```{r}
+
+testDF <- data.frame(a=runif(100), b=rpois(100,2), d=rbinom(100,1,0.5))
+
+
+# over columns
+ret <- c()
+for(i in 1:ncol(testDF)){
+	ret[i] <- mean(testDF[,i])
+}
+
+
+# over rows
+ret <- c()
+for(i in 1:nrow(testDF)){
+	ret[i] <- mean(unlist(testDF[i, ]))
+}
+
+```
+
+
+Or we could use apply statements
+
+```{r}
+
+apply(X=testDF, MARGIN=2, FUN=mean)
+apply(X=testDF, MARGIN=1, FUN=mean)
+
+```
+
+One advantage is that indexing rows of a data.frame is a pain, which is why we had to `unlist` each row in the for loop over rows above. If we do not do this, we get a vector of NA values. This is because a data.frame is a list of vectors. This is why column-wise operations on data.frames can also be performed using `lapply` (if we wanted list output) or `sapply` (if we wanted vector output).
+
+```{r}
+lapply(X=testDF, FUN=mean)
+sapply(X=testDF, FUN=mean)
+```
+
+
+
+
+
+
+
+
+
+
+## A fun class exercise 
+
+You are creating a game of rock-paper-scissors. In the game, each player can select their strategy, and the strategy can be different in each trial (where there can be 100s of trials). 
+
+I think that the outcome is random, so as a player, I already have decided what I'm going to play before the game starts. 
+```{r}
+
+strat <- sample(c('rock','paper', 'scissors'), 100, replace=TRUE)
+
+```
+
+
+
+Write a for loop to simulate rock-paper-scissors game of 500 trials between two players, where my strategy above is one of the players. 
+
+```{r}
+
+newStrat <- c()
+for(i in 1:length(strat)){
+  newStrat[i] <- sample(c('rock','paper','scissors'),1)
+}
+
+# but this is just the same as above. And we need a way to score the result to see who won right? Let's do that now. Write a function that determines who wins each round (so the inputs would be something like x='rock',y='scissors', and it would output `y` or `2` to indicate the winner)
+
+
+getScore <- function(x,y){
+  xScore <- yScore <- c()
+  payoff <- matrix(c(0,1,0,0,0,1,1,0,0), ncol=3, byrow=TRUE)
+  colnames(payoff) <- rownames(payoff) <- c('rock', 'scissors', 'paper')
+  for(i in 1:length(x)){
+    xScore[i] <- payoff[which(rownames(payoff) == x[i]), which(colnames(payoff)==y[i])]
+    yScore[i] <- payoff[which(rownames(payoff) == y[i]), which(colnames(payoff)==x[i])]
+  }
+  return(c(x=sum(xScore), y=sum(yScore)))
+}
+
+```
+
+
+
+
+
+How would you go about changing the strategy of the other player to beat my strategy? 
+
+```{r}
+
+
+tadStrat <- function(opp){
+  opts <- c('rock', 'paper', 'scissors')
+  ret <- sample(opts, 1)
+  for(i in 2:length(opp)){
+    if(opp[i-1] == 'rock'){
+      ret[i] <- 'scissors'
+    }
+    if(opp[i-1] == 'paper'){
+      ret[i] <- 'rock'
+    }
+    if(opp[i-1] == 'scissors'){
+      ret[i] <- 'paper'
+    }
+  }
+  return(ret)
+}
+
+
+
+```
+
+
+
+Let's use apply/lapply/etc some more. Let's say that I do not allow you to see my strategy directly, but I do let you test any number of strategies against mine and use the best one. Write code to generate many different strategies and select the best one given my fixed strategy `strat`. 
+
+
+```{r}
+
+stratList <- lapply(1:100000, function(x){
+  strat <- sample(c('rock','paper', 'scissors'), 100, replace=TRUE)
+})
+
+stratOut <- lapply(stratList, function(x){
+  getScore(x, strat)
+})
+
+scoreDiff <- sapply(stratOut, function(x){x[1]-x[2]})
+stratOut[[which.max(scoreDiff)]]
+stratList[[which.max(scoreDiff)]]
+
+```
+
+
+What other way could we approach this problem? 
+
+```{r}
+
+
+# a bit obvious, but I can break down each play and test all 3 strategies, picking the one that works best. 
+
+ret <- c()
+for(i in 1:length(strat)){
+  if(getScore('rock', strat[i])[1] == 1){
+    ret[i] <- 'rock'
+  }
+  if(getScore('scissors', strat[i])[1] == 1){
+    ret[i] <- 'scissors'
+  }
+  if(getScore('paper', strat[i])[1] == 1){
+    ret[i] <- 'paper'
+  }
+}
+
+
+```
+
+
+
+
+
+
+How would you modify your strategy to be adaptive? For instance, if your opponent selects 'rock' twice in a row, it may be unlikely that they'll select 'rock' again. How do you incorporate this into the code? 
+
+```{r}
+tadStrat2 <- function(opp){
+  distro <- table(opp)
+  probz <- distro / sum(distro)
+  strat <- sample(c('rock', 'paper', 'scissors'), 
+    length(opp), replace=TRUE, prob=probz[c(3,1,2)])
+  return(strat)
+}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## sessionInfo 
+
+```{r}
+
+sessionInfo()
+
+```

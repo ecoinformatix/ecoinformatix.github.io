@@ -1,5 +1,5 @@
 ---
-title: "Welcome to ecoinformatics"
+title: "Welcome to Biological Data Science"
 author: "Tad Dallas"
 includes:
   in_header:
@@ -22,7 +22,13 @@ output:
                     
 
 
-### What do I mean by 'ecoinformatics'?
+### What do I mean by 'Biological Data Science'?
+
+Researchers in biology often gather data in order to address some biological question. To actually say something about the data they have gathered, they need to use statistical analysis tools to rigorously determine whether the data support their hypothesis. For a long time in biology, this was done largely using point-and-click interfaces, or even by hand. This is no longer tenable, nor is it recommended in order to ensure reproducible and transparent research. This creates a clear need for training of biologists in how to programmatically analyze their data (i.e., write code which performs the analysis). This code could then be handed to another researcher, and the results obtained by the first researcher could be reproduced. The reproducibility of scientific research is a cornerstone is good science, and yet data and code availability requirements from funders and journals have only recently become commonplace. 
+
+
+
+This course is designed to teach you the basics of programming in R, a statistical programming language. We will cover the basics of R, and then move on to more advanced topics such as data wrangling, visualization, and statistical modeling. The goal of this course is to give you the tools you need to analyze your own data, and to help you understand the principles behind good data analysis practices.
 
 
 

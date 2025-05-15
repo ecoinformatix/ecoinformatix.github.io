@@ -1,0 +1,84 @@
+
+
+
+<p>Read the white wine data. What covariates are most strongly associated with wine quality?</p>
+<pre class="r"><code>dat &lt;- read.csv(&#39;winequality-white.csv&#39;, sep=&#39;;&#39;)
+
+
+inds &lt;- sample(1:nrow(dat), round(0.2*nrow(dat),0))
+train &lt;- dat[-inds,]
+test  &lt;- dat[inds,]
+
+write.csv(train, file=&#39;whiteWineTrain.csv&#39;)
+write.csv(test, file=&#39;whiteWineTest.csv&#39;)</code></pre>
+<p>red wine</p>
+<pre class="r"><code>dat2 &lt;- read.csv(&#39;winequality-red.csv&#39;, sep=&#39;;&#39;)
+inds2 &lt;- sample(1:nrow(dat2), round(0.2*nrow(dat2),0))
+train2 &lt;- dat2[-inds2,]
+test2  &lt;- dat2[inds2,]
+write.csv(train2, file=&#39;redWineTrain.csv&#39;)
+write.csv(test2, file=&#39;redWineTest.csv&#39;)</code></pre>
+<pre class="r"><code>mod &lt;- lm(quality ~ . ,data=dat)
+summary(mod)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = quality ~ ., data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.8348 -0.4934 -0.0379  0.4637  3.1143 
+## 
+## Coefficients:
+##                        Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)           1.502e+02  1.880e+01   7.987 1.71e-15 ***
+## fixed.acidity         6.552e-02  2.087e-02   3.139  0.00171 ** 
+## volatile.acidity     -1.863e+00  1.138e-01 -16.373  &lt; 2e-16 ***
+## citric.acid           2.209e-02  9.577e-02   0.231  0.81759    
+## residual.sugar        8.148e-02  7.527e-03  10.825  &lt; 2e-16 ***
+## chlorides            -2.473e-01  5.465e-01  -0.452  0.65097    
+## free.sulfur.dioxide   3.733e-03  8.441e-04   4.422 9.99e-06 ***
+## total.sulfur.dioxide -2.857e-04  3.781e-04  -0.756  0.44979    
+## density              -1.503e+02  1.907e+01  -7.879 4.04e-15 ***
+## pH                    6.863e-01  1.054e-01   6.513 8.10e-11 ***
+## sulphates             6.315e-01  1.004e-01   6.291 3.44e-10 ***
+## alcohol               1.935e-01  2.422e-02   7.988 1.70e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.7514 on 4886 degrees of freedom
+## Multiple R-squared:  0.2819, Adjusted R-squared:  0.2803 
+## F-statistic: 174.3 on 11 and 4886 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Now let’s focus on prediction. The point isn’t to find what variables are associated, but to predict quality. Go HAM.</p>
+<pre class="r"><code>inds &lt;- sample(1:nrow(dat), round(0.2*nrow(dat),0))
+train &lt;- dat[-inds,]
+test  &lt;- dat[inds,]</code></pre>
+<pre class="r"><code>library(gbm)</code></pre>
+<pre><code>## Loaded gbm 2.1.8</code></pre>
+<pre class="r"><code>mod &lt;- gbm::gbm(quality ~. , data=train, n.trees=1000, interaction.depth=4, cv.folds=4)</code></pre>
+<pre><code>## Distribution not specified, assuming gaussian ...</code></pre>
+<pre class="r"><code>preds &lt;- predict(mod, newdata=test, type=&#39;response&#39;, n.trees=gbm.perf(mod,method=&#39;OOB&#39;))</code></pre>
+<pre><code>## OOB generally underestimates the optimal number of iterations although predictive performance is reasonably competitive. Using cv_folds&gt;1 when calling gbm usually results in improved predictive performance.</code></pre>
+<p><img src="/code/w10_modeling/funLab/lab_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>sqrt(mean((preds-test$quality)**2))</code></pre>
+<pre><code>## [1] 0.705069</code></pre>
+<pre class="r"><code>summary(mod)</code></pre>
+<p><img src="/code/w10_modeling/funLab/lab_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre><code>##                                       var   rel.inf
+## alcohol                           alcohol 19.741211
+## volatile.acidity         volatile.acidity 11.735850
+## free.sulfur.dioxide   free.sulfur.dioxide 10.886135
+## total.sulfur.dioxide total.sulfur.dioxide  8.127548
+## density                           density  7.978943
+## residual.sugar             residual.sugar  7.744953
+## fixed.acidity               fixed.acidity  7.275747
+## pH                                     pH  6.925069
+## sulphates                       sulphates  6.632561
+## chlorides                       chlorides  6.604335
+## citric.acid                   citric.acid  6.347649</code></pre>
+<pre class="r"><code>plot(mod)</code></pre>
+<p><img src="/code/w10_modeling/funLab/lab_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<pre class="r"><code>rmse &lt;- function(preds, actual){
+    sqrt(mean((preds-actual)**2))
+}</code></pre>
+<p>How uncertain are you in your predictions?</p>
+<p>How consistent are your variable importance estimates?</p>

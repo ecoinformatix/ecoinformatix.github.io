@@ -1,7 +1,7 @@
 baseurl = ""
 languageCode = "en-us"
 defaultContentLanguage = "en-us"
-title = "Ecoinformatics"
+title = "Biological Data Science"
 theme = "material"
 paginate = 7
 relativeurls = false

@@ -371,7 +371,7 @@ plot(m6)
 
 + Normal Q-Q - residuals should go around the diagonal line, i.e., should be normally distributed. This plot helps checking if they are approximately normal.
 
-+ Scale-location - as you can see, on Y axis there are also residuals (like in Residuals vs fitted plot), but they are scaled, so it's similar to (1), but in some cases it works better.
++ Scale-location - as you can see, on Y axis there are also residuals (like in Residuals vs fitted plot), but they are scaled, so it is similar to (1), but in some cases it works better.
 
 + Residuals vs Leverage -- it helps to diagnose outlying cases. As in previous plots, outlying cases are numbered, but on this plot if there are any cases that are very different from the rest of the data they are plotted below thin red lines (check wiki on Cook's distance).
 
@@ -470,7 +470,7 @@ plot(preds2$truth, preds2$pred,
 
 ### Machine learning
 
-This idea of assessing model performance on a holdout set is not something traditional in ecological model building. This could potentially be that ecologists want to use _all_ of their data to try to get at which variables are the most associated or explain the most variance in some response variable. This is fair. But the model will always be conditioned upon on the data available (I will not go into Bayesian modeling here). The book I recommend above sort of lays a lot of the foundation down for learning more about machine learning. Machine learning methods are typically designed to bypass some of the assumptions of more traditional models like those described above. Often, this results in methods that handle NAs well, are flexible to non-linear relationships between response and predictor variables, and that tend to be pretty focused on prediction over inferene (this is not inherently true though). In fact, the book on statistical learning spends the majority of time going over the inner workings of linear models for regression adn classification. It isn't until about halfway through the book where they introduce more "machine learning -esque" methods for classification and regression such as support vector machines and tree-based approaches.
+This idea of assessing model performance on a holdout set is not something traditional in ecological model building. This could potentially be that ecologists want to use _all_ of their data to try to get at which variables are the most associated or explain the most variance in some response variable. This is fair. But the model will always be conditioned upon on the data available (I will not go into Bayesian modeling here). The book I recommend above sort of lays a lot of the foundation down for learning more about machine learning. Machine learning methods are typically designed to bypass some of the assumptions of more traditional models like those described above. Often, this results in methods that handle NAs well, are flexible to non-linear relationships between response and predictor variables, and that tend to be pretty focused on prediction over inference (this is not inherently true though). In fact, the book on statistical learning spends the majority of time going over the inner workings of linear models for regression and classification. It isn't until about halfway through the book where they introduce more "machine learning -esque" methods for classification and regression such as support vector machines and tree-based approaches.
 
 
 
@@ -484,7 +484,7 @@ trainMod2 <- function(dat, holdOut=0.2){
 	test  <- dat[inds, ]
 	mod <- glm(y ~ x1+x2, data=train)
 	mod2 <- gbm::gbm(y ~ x1+x2, data=train, n.trees=100, 
-		interaction.depth=2, cv.folds=5, n.cores=4)
+		interaction.depth=2, cv.folds=5, n.cores=2)
   brt.best.iter <- gbm::gbm.perf(mod2, method='OOB', plot=FALSE)
 	ret <- data.frame(truth=test$y, 
 		predGLM=predict(mod, newdata=test), 
@@ -537,7 +537,7 @@ On average, using the boosted regression tree resulted in a change in root mean 
 
 
 glmA2 <- gbmA2 <- c()
-for(i in 1:1000){
+for(i in 1:100){
 	set.seed(i)
 	preds3 <- trainMod2(dat)
 

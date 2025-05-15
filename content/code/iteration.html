@@ -1,0 +1,481 @@
+---
+title: "Iteration"
+author: "Tad Dallas"
+includes:
+  in_header:
+    - \usepackage{lmodern}
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    toc: yes
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 6
+    highlight: tango
+    theme: journal
+---
+
+
+
+<div id="what-is-iteration" class="section level3">
+<h3>What is iteration?</h3>
+<p>Iteration refers to the process of doing the same task to a bunch of different objects. Consider a toy example of the actions required by a cashier at a grocery store. They scan each item, where items can be different sizes/shapes/prices. This is an iterative task, as it uses the same motions (essentially) across a variety of different objects (groceries) which may vary in many ways, but have some commonalities (e.g., most items have a barcode).</p>
+</div>
+<div id="why-is-iteration-important" class="section level3">
+<h3>Why is iteration important?</h3>
+<p>Up until this point, we have dealt with single data.frame objects (or vectors, the building blocks of data.frames). However, we also introduced the concept of <code>lists</code> in one of the first lectures, and will go into more detail about lists soon. For now, we’ll talk about iteration independent of list objects, but keep in mind that iteration is important for lists.</p>
+<p>Essentially, iteration allows us to process a large amount of data without the need to repeat ourselves. Recall the gapminder data.</p>
+<pre class="r"><code>dat &lt;- read.delim(file = &quot;http://www.stat.ubc.ca/~jenny/notOcto/STAT545A/examples/gapminder/data/gapminderDataFiveYear.txt&quot;)</code></pre>
+<p>We discussed the <code>gapminder</code> data when introducing some tools around data subsetting and summarising. We ended that lecture by discussing <code>dplyr</code>, a useful package for data processing.</p>
+<pre class="r"><code>library(plyr)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<p>Recall that towards the end of that lecture, we introduce piping commands with <code>dplyr</code> to summarise data. For instance, the code below calculates mean life expectancy (<code>lifeExp</code>) by <code>country</code>.</p>
+<pre class="r"><code>tmp3 &lt;- dat |&gt;
+	dplyr::group_by(country) |&gt;
+	dplyr::summarise(mnLifeExp=mean(lifeExp))</code></pre>
+<p>Approaching this with <code>dplyr</code> offers us a powerful way to summarise our data, but you will inevitably hit the limits of <code>dplyr</code> and thinking about how to do this in base R is difficult, right? In base R, we discussed subsetting, but to do what the above code does, we would have to subset by every country and then calculate the mean <code>lifeExp</code> for each subset. This is a good jumping off point for iteration, starting with the idea of the <code>for</code> loop (some folks use ‘looping’ and ‘iteration’ to mean the same thing). So we want a way to subset the <code>dat</code> data.frame by country, and then calculate mean <code>lifeExp</code>.</p>
+<p>To start, we need to get a vector of the countries in the data.</p>
+<pre class="r"><code>countries &lt;- unique(dat$country)</code></pre>
+<p>Then we need to get the overall structure of the loop in place. To do this, we use the structure <code>for(i in range){ do something}</code>. Essentially, we need to first define the range of what we want the loop to do, and then within the curly brackets, we need to do the thing. The power of this comes from the <code>i</code> in the <code>for</code> loop call. This is essentially saying to temporally treat <code>i</code> as one of the values in <code>range</code>, do something considering that, and then set <code>i</code> to the next value. This sequential process means that at the end of the loop, we will have cycled through all the entries in <code>range</code>.</p>
+<pre class="r"><code>for(i in countries){
+  print(i)
+}</code></pre>
+<pre><code>## [1] &quot;Afghanistan&quot;
+## [1] &quot;Albania&quot;
+## [1] &quot;Algeria&quot;
+## [1] &quot;Angola&quot;
+## [1] &quot;Argentina&quot;
+## [1] &quot;Australia&quot;
+## [1] &quot;Austria&quot;
+## [1] &quot;Bahrain&quot;
+## [1] &quot;Bangladesh&quot;
+## [1] &quot;Belgium&quot;
+## [1] &quot;Benin&quot;
+## [1] &quot;Bolivia&quot;
+## [1] &quot;Bosnia and Herzegovina&quot;
+## [1] &quot;Botswana&quot;
+## [1] &quot;Brazil&quot;
+## [1] &quot;Bulgaria&quot;
+## [1] &quot;Burkina Faso&quot;
+## [1] &quot;Burundi&quot;
+## [1] &quot;Cambodia&quot;
+## [1] &quot;Cameroon&quot;
+## [1] &quot;Canada&quot;
+## [1] &quot;Central African Republic&quot;
+## [1] &quot;Chad&quot;
+## [1] &quot;Chile&quot;
+## [1] &quot;China&quot;
+## [1] &quot;Colombia&quot;
+## [1] &quot;Comoros&quot;
+## [1] &quot;Congo, Dem. Rep.&quot;
+## [1] &quot;Congo, Rep.&quot;
+## [1] &quot;Costa Rica&quot;
+## [1] &quot;Cote d&#39;Ivoire&quot;
+## [1] &quot;Croatia&quot;
+## [1] &quot;Cuba&quot;
+## [1] &quot;Czech Republic&quot;
+## [1] &quot;Denmark&quot;
+## [1] &quot;Djibouti&quot;
+## [1] &quot;Dominican Republic&quot;
+## [1] &quot;Ecuador&quot;
+## [1] &quot;Egypt&quot;
+## [1] &quot;El Salvador&quot;
+## [1] &quot;Equatorial Guinea&quot;
+## [1] &quot;Eritrea&quot;
+## [1] &quot;Ethiopia&quot;
+## [1] &quot;Finland&quot;
+## [1] &quot;France&quot;
+## [1] &quot;Gabon&quot;
+## [1] &quot;Gambia&quot;
+## [1] &quot;Germany&quot;
+## [1] &quot;Ghana&quot;
+## [1] &quot;Greece&quot;
+## [1] &quot;Guatemala&quot;
+## [1] &quot;Guinea&quot;
+## [1] &quot;Guinea-Bissau&quot;
+## [1] &quot;Haiti&quot;
+## [1] &quot;Honduras&quot;
+## [1] &quot;Hong Kong, China&quot;
+## [1] &quot;Hungary&quot;
+## [1] &quot;Iceland&quot;
+## [1] &quot;India&quot;
+## [1] &quot;Indonesia&quot;
+## [1] &quot;Iran&quot;
+## [1] &quot;Iraq&quot;
+## [1] &quot;Ireland&quot;
+## [1] &quot;Israel&quot;
+## [1] &quot;Italy&quot;
+## [1] &quot;Jamaica&quot;
+## [1] &quot;Japan&quot;
+## [1] &quot;Jordan&quot;
+## [1] &quot;Kenya&quot;
+## [1] &quot;Korea, Dem. Rep.&quot;
+## [1] &quot;Korea, Rep.&quot;
+## [1] &quot;Kuwait&quot;
+## [1] &quot;Lebanon&quot;
+## [1] &quot;Lesotho&quot;
+## [1] &quot;Liberia&quot;
+## [1] &quot;Libya&quot;
+## [1] &quot;Madagascar&quot;
+## [1] &quot;Malawi&quot;
+## [1] &quot;Malaysia&quot;
+## [1] &quot;Mali&quot;
+## [1] &quot;Mauritania&quot;
+## [1] &quot;Mauritius&quot;
+## [1] &quot;Mexico&quot;
+## [1] &quot;Mongolia&quot;
+## [1] &quot;Montenegro&quot;
+## [1] &quot;Morocco&quot;
+## [1] &quot;Mozambique&quot;
+## [1] &quot;Myanmar&quot;
+## [1] &quot;Namibia&quot;
+## [1] &quot;Nepal&quot;
+## [1] &quot;Netherlands&quot;
+## [1] &quot;New Zealand&quot;
+## [1] &quot;Nicaragua&quot;
+## [1] &quot;Niger&quot;
+## [1] &quot;Nigeria&quot;
+## [1] &quot;Norway&quot;
+## [1] &quot;Oman&quot;
+## [1] &quot;Pakistan&quot;
+## [1] &quot;Panama&quot;
+## [1] &quot;Paraguay&quot;
+## [1] &quot;Peru&quot;
+## [1] &quot;Philippines&quot;
+## [1] &quot;Poland&quot;
+## [1] &quot;Portugal&quot;
+## [1] &quot;Puerto Rico&quot;
+## [1] &quot;Reunion&quot;
+## [1] &quot;Romania&quot;
+## [1] &quot;Rwanda&quot;
+## [1] &quot;Sao Tome and Principe&quot;
+## [1] &quot;Saudi Arabia&quot;
+## [1] &quot;Senegal&quot;
+## [1] &quot;Serbia&quot;
+## [1] &quot;Sierra Leone&quot;
+## [1] &quot;Singapore&quot;
+## [1] &quot;Slovak Republic&quot;
+## [1] &quot;Slovenia&quot;
+## [1] &quot;Somalia&quot;
+## [1] &quot;South Africa&quot;
+## [1] &quot;Spain&quot;
+## [1] &quot;Sri Lanka&quot;
+## [1] &quot;Sudan&quot;
+## [1] &quot;Swaziland&quot;
+## [1] &quot;Sweden&quot;
+## [1] &quot;Switzerland&quot;
+## [1] &quot;Syria&quot;
+## [1] &quot;Taiwan&quot;
+## [1] &quot;Tanzania&quot;
+## [1] &quot;Thailand&quot;
+## [1] &quot;Togo&quot;
+## [1] &quot;Trinidad and Tobago&quot;
+## [1] &quot;Tunisia&quot;
+## [1] &quot;Turkey&quot;
+## [1] &quot;Uganda&quot;
+## [1] &quot;United Kingdom&quot;
+## [1] &quot;United States&quot;
+## [1] &quot;Uruguay&quot;
+## [1] &quot;Venezuela&quot;
+## [1] &quot;Vietnam&quot;
+## [1] &quot;West Bank and Gaza&quot;
+## [1] &quot;Yemen, Rep.&quot;
+## [1] &quot;Zambia&quot;
+## [1] &quot;Zimbabwe&quot;</code></pre>
+<blockquote>
+<p>So what did the above code do?</p>
+</blockquote>
+<p>Alright. So we have a way to sequentially work through all of the <code>countries</code> and we know how to subset the data based on country. So we can now subset the data for each of the countries, using the <code>i</code> iterator as a stand-in for each of the country names. But this does not actually do anything with the data, such that <code>tmp</code> will just be the subset data for the last country in the <code>countries</code> vector.</p>
+<pre class="r"><code>for(i in countries){
+  tmp &lt;- dat[which(dat$country == i), ]
+}</code></pre>
+<p>So let’s now compute the mean <code>lifeExp</code> for each country.</p>
+<pre class="r"><code>meanLifeExp &lt;- c()
+for(i in countries){
+  tmp &lt;- dat[which(dat$country == i), ]
+  meanLifeExp &lt;- c(meanLifeExp, mean(tmp$lifeExp))
+}</code></pre>
+<p>Here, we first create a vector to hold the output data (<code>meanLifeExp</code>) and then append the value for each mean onto the vector. That is, we essentially re-write the <code>meanLifeExp</code> vector at every step of the iteration. This is bad practice for a number of reasons (e.g., no memory efficient, writing over objects where the object itself is in the call is bad practice, etc.). So how can we get around doing this? <code>for</code> loops can be handed a vector of character values (as we have done above) or they can be handed a numeric range. This is often useful, as it eases indexing and can be a bit clearer in the code.</p>
+<pre class="r"><code>meanLifeExp &lt;- c()
+for(i in 1:length(countries)){
+  tmp &lt;- dat[which(dat$country == countries[i]), ]
+  meanLifeExp[i] &lt;- mean(tmp$lifeExp)
+}</code></pre>
+<p>And the results of this code should be the same as the other <code>for</code> loop. We now have a vector of mean life expectancy values for each country in <code>countries</code>. But that was a fair bit of work to get the same thing we could have gotten with <code>dplyr</code>, right? Let’s explore a situation where it would be a bit tougher to get the same thing out of <code>dplyr</code> (at least with our current knowledge, as the example I’ll give below can be solved using <code>dplyr::do</code>).</p>
+<p>Let’s say that we want to explore the relationship between <code>year</code> and <code>lifeExp</code> for each country. That is, we want to know how life expectancy is changing over time across the different countries. To do this, we can use the <code>cor.test</code> function in R to calculate Pearson’s correlation coefficients (assumes linear structure between the two variables) or Spearman’s rank correlation (assumes monotonic, but not linear response). The output of <code>cor.test</code> is a object, such that <code>dplyr::summarise</code> would fail.</p>
+<pre class="r"><code>tmp3 &lt;- dat |&gt;
+	dplyr::group_by(country) |&gt;
+	dplyr::summarise(cor.test(year, lifeExp))</code></pre>
+<p>So summarise expects the output to be a vector (note that there are ways around this, by pulling out the information we want from the cor.test)</p>
+<pre class="r"><code>tmp3 &lt;- dat |&gt;
+	dplyr::group_by(country) |&gt;
+	dplyr::summarise(cor.test(year, lifeExp)$estimate)</code></pre>
+<p>But how we do pull out multiple values from the same test? And how do we handle and diagnose potential errors when we don’t work through each test sequentially?</p>
+<pre class="r"><code>lifeExpTime &lt;- matrix(0, ncol=4, nrow=length(countries))
+
+for(i in 1:length(countries)){
+  tmp &lt;- dat[which(dat$country == countries[i]), ]
+  crP &lt;- cor.test(tmp$year, tmp$lifeExp)
+  crS &lt;- cor.test(tmp$year, tmp$lifeExp, method=&#39;spearman&#39;)
+  lifeExpTime[i, ] &lt;- c(crP$estimate, crP$p.value, 
+    crS$estimate, crS$p.value)
+}</code></pre>
+<pre><code>## Warning in cor.test.default(tmp$year, tmp$lifeExp, method = &quot;spearman&quot;): Cannot
+## compute exact p-value with ties</code></pre>
+<pre class="r"><code>colnames(lifeExpTime) &lt;- c(&#39;pearsonEst&#39;, &#39;pearsonP&#39;, 
+  &#39;spearmanEst&#39;, &#39;spearmanP&#39;)
+
+lifeExpTime &lt;- as.data.frame(lifeExpTime)
+lifeExpTime$country &lt;- countries </code></pre>
+<p>And we can explore these data, to determine which countries have increasing or decreasing life expectancy values as a function of time.</p>
+<pre class="r"><code>lifeExpTime[which.min(lifeExpTime$pearsonEst),]</code></pre>
+<pre><code>##     pearsonEst  pearsonP spearmanEst spearmanP country
+## 141 -0.2446149 0.4435318  -0.1888112 0.5578278  Zambia</code></pre>
+<p>This may seem like a lot of work when we could have done a bit less using <code>dplyr</code> syntax. The real power of <code>for</code> loops will be in working with lists, simulating data, and plotting. For instace, let’s say we don’t have data directly to work with, but want to generate data. We could generate a bunch of data, mash it all together in a data.frame, and then feed it into <code>dplyr</code>, the data generation step would require a <code>for</code> loop already, so why not keep things all contained in the <code>for</code> loop.</p>
+<p>Let’s say we want to create a Fibonacci sequence. This is a vector of numbers in which each number is the sum of the two preceding numbers in the vector. For the example, we will limit the length of the vector to be length 1000.</p>
+<pre class="r"><code>fib &lt;- c(0,1)
+for(i in 3:1000){
+  fib[i] &lt;- sum(fib[(i-2):(i-1)])
+}</code></pre>
+<p>And now we have a Fibonacci sequence starting with <code>c(0,1)</code>.</p>
+<blockquote>
+<p>Why do I start the <code>for</code> loop above at 3, and how else could you approach this same problem (there are many ways)?</p>
+</blockquote>
+</div>
+<div id="apply-statements" class="section level3">
+<h3>Apply statements</h3>
+<p><code>apply</code> statements exist in many types, depending on the data.structure you wish to do the action on: e.g. <code>apply</code>, <code>sapply</code>, <code>lapply</code>, <code>vapply</code>, <code>tapply</code>. We will focus on <code>apply</code> and <code>lapply</code>, but realize that these other options may be better suited for your use case (especially <code>vapply</code>, which gives you a bit more control over output format). In the loop above, we wanted to find the mean of each entry in a list. We used a <code>for</code> loop to loop over elements, and stored the resulting means in a vector called <code>out</code>. Instead, we could use <code>lapply</code>…the <code>l</code> in it means it performs some action on a list object.</p>
+<p>We will use biological data on ringtail poop sampled between 2020 and 2022 in Zion National Park and Grand Canyon National Park by Anna Willoughby. More information on the goals of the project are available here (<a href="https://github.com/DrakeLab/willoughby-ringtail-fieldwork" class="uri">https://github.com/DrakeLab/willoughby-ringtail-fieldwork</a>).</p>
+<pre class="r"><code>dat2 &lt;- read.csv(&quot;https://raw.githubusercontent.com/DrakeLab/willoughby-ringtail-fieldwork/refs/heads/master/data/ZNP-2019_Fecal_Fragments.csv&quot;)
+
+dat2 &lt;- dat2[,1:10 ]
+
+testList2 &lt;- split(dat2, dat2$FragmentType)</code></pre>
+<p>The <code>split</code> function takes a data.frame and splits it into a list of data.frames, where each data.frame is a subset of the original data.frame. The <code>lapply</code> function takes a list and applies a function to each element in the list.</p>
+<pre class="r"><code>lapply(X=testList2, FUN=nrow)</code></pre>
+<pre><code>## $Anthropogenic
+## [1] 107
+## 
+## $Contaminant
+## [1] 22
+## 
+## $Invertebrate
+## [1] 41
+## 
+## $Organic
+## [1] 2
+## 
+## $Plant
+## [1] 51
+## 
+## $Unknown
+## [1] 18
+## 
+## $Vertebrate
+## [1] 127</code></pre>
+<p>The output of <code>lapply</code> will always be a list, which is nice in some instances and not nice in others. <code>sapply</code> is a wrapper for <code>lapply</code> which always returns a vector of values.</p>
+<pre class="r"><code>sapply(X=testList2, FUN=nrow)</code></pre>
+<pre><code>## Anthropogenic   Contaminant  Invertebrate       Organic         Plant 
+##           107            22            41             2            51 
+##       Unknown    Vertebrate 
+##            18           127</code></pre>
+<p>Now that we have an idea of what the <code>apply</code> family of functions do, we can look specifically at <code>apply</code>, which operates on matrices or data.frames. What if we wanted to calculate the mean of every column or row in a data.frame? We could loop over each column or row…</p>
+<pre class="r"><code>testDF &lt;- data.frame(a=runif(100), b=rpois(100,2), d=rbinom(100,1,0.5))
+
+
+# over columns
+ret &lt;- c()
+for(i in 1:ncol(testDF)){
+	ret[i] &lt;- mean(testDF[,i])
+}
+
+
+# over rows
+ret &lt;- c()
+for(i in 1:nrow(testDF)){
+	ret[i] &lt;- mean(unlist(testDF[i, ]))
+}</code></pre>
+<p>Or we could use apply statements</p>
+<pre class="r"><code>apply(X=testDF, MARGIN=2, FUN=mean)</code></pre>
+<pre><code>##         a         b         d 
+## 0.5101709 2.0200000 0.4800000</code></pre>
+<pre class="r"><code>apply(X=testDF, MARGIN=1, FUN=mean)</code></pre>
+<pre><code>##   [1] 1.63344500 0.93192027 1.04341545 1.22872890 0.35808525 1.35301268
+##   [7] 0.71280466 0.59949944 1.04990547 1.19467150 1.11435016 1.37673629
+##  [13] 0.75445124 0.55370163 1.84280356 1.10136895 1.52657820 0.69389488
+##  [19] 1.26351795 1.19275086 0.60239859 2.23641526 0.22840230 0.61682748
+##  [25] 0.68828474 0.87787384 2.22444505 0.64951662 0.40672241 1.28627697
+##  [31] 0.94444474 0.87356067 0.59226570 0.43514881 0.35840461 0.15428393
+##  [37] 1.20178371 1.65984342 1.28027255 0.89455170 1.16776878 0.77814240
+##  [43] 1.28267732 0.81325903 0.81982502 0.73185620 1.46942026 3.13487771
+##  [49] 0.10770333 2.13198584 1.36839098 1.47968399 1.54399668 1.41840023
+##  [55] 1.25048976 1.27503919 0.38872017 1.11797818 0.52365169 0.33497883
+##  [61] 0.58842375 2.02858578 0.01018325 0.99189000 0.53294045 1.24045340
+##  [67] 1.06629620 1.63459551 0.58254419 1.32149162 0.88190605 1.97785568
+##  [73] 1.78855345 0.96902975 1.21147338 1.33116166 1.28779570 1.07030685
+##  [79] 0.37781782 0.50230702 0.59668131 0.42599790 0.67004553 1.03476864
+##  [85] 0.31995371 1.15386480 0.53511018 1.32398639 0.67152307 0.89614359
+##  [91] 0.69366394 0.68713736 0.49882076 1.62419397 0.38568970 0.62573991
+##  [97] 1.14247784 1.95064016 0.06348099 0.76728694</code></pre>
+<p>One advantage is that indexing rows of a data.frame is a pain, which is why we had to <code>unlist</code> each row in the for loop over rows above. If we do not do this, we get a vector of NA values. This is because a data.frame is a list of vectors. This is why column-wise operations on data.frames can also be performed using <code>lapply</code> (if we wanted list output) or <code>sapply</code> (if we wanted vector output).</p>
+<pre class="r"><code>lapply(X=testDF, FUN=mean)</code></pre>
+<pre><code>## $a
+## [1] 0.5101709
+## 
+## $b
+## [1] 2.02
+## 
+## $d
+## [1] 0.48</code></pre>
+<pre class="r"><code>sapply(X=testDF, FUN=mean)</code></pre>
+<pre><code>##         a         b         d 
+## 0.5101709 2.0200000 0.4800000</code></pre>
+</div>
+<div id="some-practice-problems" class="section level2">
+<h2>Some practice problems</h2>
+<ol style="list-style-type: decimal">
+<li><p>Above, we defined a data set as a list on ringtail diet changes as a function of time. Using those data, calculate the mean dry fragment weight for each of the fragment types.</p></li>
+<li><p>The data are divided out into <code>Segment</code>s and <code>Fragment</code>s, where <code>Segment</code>s are composed on smaller fragments of different types. Using what you know (either for loop or apply style statements), calculate the fraction of <code>Anthropogenic</code> fragments (<code>Anthropogenic</code> is a <code>FragmentType</code>) in each <code>Segment</code>.</p></li>
+</ol>
+</div>
+<div id="a-fun-class-exercise" class="section level2">
+<h2>A fun class exercise</h2>
+<p>You are creating a game of rock-paper-scissors. In the game, each player can select their strategy, and the strategy can be different in each trial (where there can be 100s of trials).</p>
+<p>I think that the outcome is random, so as a player, I already have decided what I’m going to play before the game starts.</p>
+<pre class="r"><code>strat &lt;- sample(c(&#39;rock&#39;,&#39;paper&#39;, &#39;scissors&#39;), 100, replace=TRUE)</code></pre>
+<p>Write a for loop to simulate rock-paper-scissors game of 500 trials between two players, where my strategy above is one of the players.</p>
+<pre class="r"><code>newStrat &lt;- c()
+for(i in 1:length(strat)){
+  newStrat[i] &lt;- sample(c(&#39;rock&#39;,&#39;paper&#39;,&#39;scissors&#39;),1)
+}
+
+# but this is just the same as above. And we need a way to score the result to see who won right? Let&#39;s do that now. Write a function that determines who wins each round (so the inputs would be something like x=&#39;rock&#39;,y=&#39;scissors&#39;, and it would output `y` or `2` to indicate the winner)
+
+
+getScore &lt;- function(x,y){
+  xScore &lt;- yScore &lt;- c()
+  payoff &lt;- matrix(c(0,1,0,0,0,1,1,0,0), ncol=3, byrow=TRUE)
+  colnames(payoff) &lt;- rownames(payoff) &lt;- c(&#39;rock&#39;, &#39;scissors&#39;, &#39;paper&#39;)
+  for(i in 1:length(x)){
+    xScore[i] &lt;- payoff[which(rownames(payoff) == x[i]), which(colnames(payoff)==y[i])]
+    yScore[i] &lt;- payoff[which(rownames(payoff) == y[i]), which(colnames(payoff)==x[i])]
+  }
+  return(c(x=sum(xScore), y=sum(yScore)))
+}</code></pre>
+<p>How would you go about changing the strategy of the other player to beat my strategy?</p>
+<pre class="r"><code>tadStrat &lt;- function(opp){
+  opts &lt;- c(&#39;rock&#39;, &#39;paper&#39;, &#39;scissors&#39;)
+  ret &lt;- sample(opts, 1)
+  for(i in 2:length(opp)){
+    if(opp[i-1] == &#39;rock&#39;){
+      ret[i] &lt;- &#39;scissors&#39;
+    }
+    if(opp[i-1] == &#39;paper&#39;){
+      ret[i] &lt;- &#39;rock&#39;
+    }
+    if(opp[i-1] == &#39;scissors&#39;){
+      ret[i] &lt;- &#39;paper&#39;
+    }
+  }
+  return(ret)
+}</code></pre>
+<p>Let’s use apply/lapply/etc some more. Let’s say that I do not allow you to see my strategy directly, but I do let you test any number of strategies against mine and use the best one. Write code to generate many different strategies and select the best one given my fixed strategy <code>strat</code>.</p>
+<pre class="r"><code>stratList &lt;- lapply(1:100000, function(x){
+  strat &lt;- sample(c(&#39;rock&#39;,&#39;paper&#39;, &#39;scissors&#39;), 100, replace=TRUE)
+})
+
+stratOut &lt;- lapply(stratList, function(x){
+  getScore(x, strat)
+})
+
+scoreDiff &lt;- sapply(stratOut, function(x){x[1]-x[2]})
+stratOut[[which.max(scoreDiff)]]</code></pre>
+<pre><code>##  x  y 
+## 50 17</code></pre>
+<pre class="r"><code>stratList[[which.max(scoreDiff)]]</code></pre>
+<pre><code>##   [1] &quot;paper&quot;    &quot;paper&quot;    &quot;rock&quot;     &quot;scissors&quot; &quot;scissors&quot; &quot;scissors&quot;
+##   [7] &quot;rock&quot;     &quot;scissors&quot; &quot;paper&quot;    &quot;paper&quot;    &quot;rock&quot;     &quot;scissors&quot;
+##  [13] &quot;paper&quot;    &quot;rock&quot;     &quot;paper&quot;    &quot;rock&quot;     &quot;rock&quot;     &quot;scissors&quot;
+##  [19] &quot;scissors&quot; &quot;paper&quot;    &quot;paper&quot;    &quot;scissors&quot; &quot;paper&quot;    &quot;rock&quot;    
+##  [25] &quot;paper&quot;    &quot;scissors&quot; &quot;paper&quot;    &quot;rock&quot;     &quot;scissors&quot; &quot;rock&quot;    
+##  [31] &quot;paper&quot;    &quot;scissors&quot; &quot;scissors&quot; &quot;scissors&quot; &quot;rock&quot;     &quot;paper&quot;   
+##  [37] &quot;paper&quot;    &quot;rock&quot;     &quot;rock&quot;     &quot;scissors&quot; &quot;paper&quot;    &quot;scissors&quot;
+##  [43] &quot;scissors&quot; &quot;rock&quot;     &quot;scissors&quot; &quot;scissors&quot; &quot;scissors&quot; &quot;rock&quot;    
+##  [49] &quot;paper&quot;    &quot;scissors&quot; &quot;scissors&quot; &quot;rock&quot;     &quot;paper&quot;    &quot;scissors&quot;
+##  [55] &quot;scissors&quot; &quot;rock&quot;     &quot;rock&quot;     &quot;scissors&quot; &quot;scissors&quot; &quot;rock&quot;    
+##  [61] &quot;paper&quot;    &quot;scissors&quot; &quot;scissors&quot; &quot;rock&quot;     &quot;rock&quot;     &quot;scissors&quot;
+##  [67] &quot;rock&quot;     &quot;rock&quot;     &quot;paper&quot;    &quot;paper&quot;    &quot;scissors&quot; &quot;paper&quot;   
+##  [73] &quot;rock&quot;     &quot;rock&quot;     &quot;rock&quot;     &quot;scissors&quot; &quot;paper&quot;    &quot;paper&quot;   
+##  [79] &quot;scissors&quot; &quot;paper&quot;    &quot;paper&quot;    &quot;rock&quot;     &quot;paper&quot;    &quot;scissors&quot;
+##  [85] &quot;scissors&quot; &quot;scissors&quot; &quot;paper&quot;    &quot;scissors&quot; &quot;scissors&quot; &quot;rock&quot;    
+##  [91] &quot;rock&quot;     &quot;paper&quot;    &quot;rock&quot;     &quot;paper&quot;    &quot;paper&quot;    &quot;scissors&quot;
+##  [97] &quot;paper&quot;    &quot;paper&quot;    &quot;paper&quot;    &quot;rock&quot;</code></pre>
+<p>What other way could we approach this problem?</p>
+<pre class="r"><code># a bit obvious, but I can break down each play and test all 3 strategies, picking the one that works best. 
+
+ret &lt;- c()
+for(i in 1:length(strat)){
+  if(getScore(&#39;rock&#39;, strat[i])[1] == 1){
+    ret[i] &lt;- &#39;rock&#39;
+  }
+  if(getScore(&#39;scissors&#39;, strat[i])[1] == 1){
+    ret[i] &lt;- &#39;scissors&#39;
+  }
+  if(getScore(&#39;paper&#39;, strat[i])[1] == 1){
+    ret[i] &lt;- &#39;paper&#39;
+  }
+}</code></pre>
+</div>
+<div id="sessioninfo" class="section level2">
+<h2>sessionInfo</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.5.0 (2025-04-11)
+## Platform: x86_64-pc-linux-gnu
+## Running under: Ubuntu 22.04.5 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/atlas/libblas.so.3.10.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: America/New_York
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] dplyr_1.1.4 plyr_1.8.9 
+## 
+## loaded via a namespace (and not attached):
+##  [1] vctrs_0.6.5       cli_3.6.5         knitr_1.49        rlang_1.1.6      
+##  [5] xfun_0.49         generics_0.1.4    jsonlite_1.8.9    glue_1.8.0       
+##  [9] htmltools_0.5.8.1 sass_0.4.9        rmarkdown_2.29    tibble_3.2.1     
+## [13] evaluate_1.0.1    jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.10      
+## [17] lifecycle_1.0.4   bookdown_0.34     compiler_4.5.0    pkgconfig_2.0.3  
+## [21] Rcpp_1.0.14       blogdown_1.18     digest_0.6.37     R6_2.6.1         
+## [25] tidyselect_1.2.1  pillar_1.10.2     magrittr_2.0.3    bslib_0.8.0      
+## [29] tools_4.5.0       cachem_1.1.0</code></pre>
+</div>

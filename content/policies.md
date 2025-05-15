@@ -33,10 +33,10 @@ Grades will be assigned using the following weighted components:
 
 component      | weight
 :---------------|-----:
-HW Exercises   | 30% 
+HW Exercises    | 30% 
 In class problems| 20%
-Participation  | 10% 
-Group project  | 40% 
+Participation  | 20% 
+Group project  | 30% 
 
 
 
@@ -44,8 +44,8 @@ Group project  | 40%
 
 component      | weight
 :---------------|-----:
-HW Exercises   | 30% 
-In class problems| 20%
+HW Exercises   | 20% 
+In class problems| 30%
 Participation  | 10% 
 Project        | 40% 
 
@@ -112,6 +112,7 @@ Please create your proposal in a markdown file called `proposal.md` in the root 
 
 
 **Project development**
+
 You will develop the project throughout the semester, using tools and approaches that you learn during the course. Do this early and consistently. I will be able to track your progress on GitHub, meaning that I expect to see continued development on the project and not a last minute flurry of commits. 
 
 Graduate students: this is an opportunity to push forward your research. Ideally, the resulting project manuscript is something that could be submitted to an academic journal. 
@@ -119,9 +120,11 @@ Graduate students: this is an opportunity to push forward your research. Ideally
 
 
 **Final product**
+
 You will present your final project as a 15 minute presentation at the end of the semester. It should provide context and information about the 'what, why, and how' of your research question, and go through your findings, preferably demonstrating your ability to visualize data. 
 
 Graduate students: think of this as something you would feel comfortable presenting at an academic conference. 
+
 
 
 
@@ -181,16 +184,16 @@ Ideally, whatever question you choose will allow you to showcase your new R skil
 
 Date |  Event
 :-----------|-----:
-Sept 21 |first homework due 
-Sept 28 | final project proposal due; [use this template](https://classroom.github.com/a/391LMC59)
-October 12 | second homework due 
-November 2 | third homework due 
-December 7 | fourth homework due 
+Sept 18 |first homework due 
+Sept 25 | final project proposal due; [use this template](https://classroom.github.com/a/391LMC59)
+October 16 | second homework due 
+November 6 | third homework due 
+December 4 | fourth homework due 
 
 
-_Last day of classes is December 8, reading dat is Dec 9_
+_Last day of classes is December 5, reading dat is Dec 6_
 
-Present final project during final exam period: **Thursday, December 14 - 4:00 p.m.**
+Present final project during final exam period: **Tuesday, December 9 - 4:00 p.m.**
 
 
 
@@ -217,6 +220,7 @@ Cooperation has a limit. You should not copy your code or answers directly with 
 
 Rather than copying someone else's work, ask for help. You are not alone in this course! If you invest the time to learn the material and complete the projects, you won't need to copy any answers.
 
+It is easy to use web sources like StackOverflow and large language models (e.g., chatGpt) to give often correct answers to the homework questions. Fight this urge, as the majority of your grade is not determined by homework, but by in-class problems and the final project. If you fail to learn the material well enough through the class and homework exercises as a result of relying on these other tools, I cannot imagine you will do especially well during times when you don't have access to these tools. Also, it's essentially cheating, and there are some pretty clear 'tells', especially for some of the large language models like chatGpt, code Llama, co-pilot, etc. 
 
 
 

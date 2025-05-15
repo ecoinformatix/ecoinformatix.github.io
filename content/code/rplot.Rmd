@@ -27,11 +27,10 @@ output:
 
 ## Why is data visualization important?
 
+
 ### exploratory data analysis
 
-Visualizations help identify interesting things about the data. This includes how the data are distributed, values that are outliers, and potential mistakes in data entry. 
-
-
+Visualizations help identify interesting things about the data. This includes how the data are distributed, values that are outliers, and potential mistakes in data entry. Use visualization to essentially assure yourself of the quality of the data and identify potential issues. 
 
 ### clear demonstration of results relative to tables or statistics
 
@@ -63,6 +62,10 @@ par(mar=c(4,4,0.5,0.5))
 Running this code should open up a blank plotting window, but with margins present. The input to `mar` is a vector of 4 values, identifying the amount of space (in lines, I believe) for the bottom, left, top, and right plotting areas, respectively. 
 
 > What does the above code identify the margins as? Why do we opt to have values of 4 for the first 2 and then values of 0.5 for the second 2?
+
+
+
+
 
 
 ## histograms
@@ -98,6 +101,8 @@ hist(uniformRV, breaks=10,
   border='dodgerblue')
 
 ```
+
+
 
 
 
@@ -154,6 +159,28 @@ This builds on what we previously learned about **conditionals**, as well as wha
 
 
 
+
+
+
+> Read in the following data. Visualize the distribution of parasite classes (`Par.Class`). 
+
+```{r}
+
+helm <- read.csv('https://raw.githubusercontent.com/')
+
+```
+
+
+
+
+
+> Using these same data, what is the relationship between male and female max body length? 
+
+```{r}
+
+
+
+```
 
 
 
@@ -308,6 +335,9 @@ In practice, this is not a great visualization. That is, we don't need the legen
 + In time-series displays of money, deflated and standardized units of monetary measurement are nearly always better than nominal units.
 
 + The number of information carrying (variable) dimensions depicted should not exceed the number of dimensions in the data. Graphics must not quote data out of context.
+
+
+
 
 
 

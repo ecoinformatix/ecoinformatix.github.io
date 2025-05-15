@@ -1,5 +1,5 @@
 ---
-title: "Ecoinformatics"
+title: "Biological Data Science"
 markup: "goldmark"
 ---
 
@@ -18,7 +18,7 @@ All [notes as pdf](https://github.com/ecoinformatix/ecoinformatix.github.io/tree
 
 ## Overview
 
-This course is designed for undergraduate students and early career graduate researchers regardless of prior experience. We aim to be accessible to those new to programming, but those who have been using R for years will find new material, best practices, and tools to enhance reproducibility in scientific research. The course is project-focused and centered around 4 modules aimed at teaching programming skills while also exploring scientific data and questions. 
+This course is designed for advanced undergraduate students and early career graduate researchers regardless of prior experience. We aim to be accessible to those new to programming, but those who have been using R for years will find new material, best practices, and tools to enhance reproducibility in scientific research. The course is project-focused and centered around 4 modules aimed at teaching programming skills while also exploring scientific data and questions. 
 
 
 

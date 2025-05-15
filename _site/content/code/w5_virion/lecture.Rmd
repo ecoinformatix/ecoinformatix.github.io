@@ -1,0 +1,360 @@
+## VERENA
+
+The Viral Emergence Research Initiative (VERENA) is a global consortium. Our goal is to curate the largest ecosystem of open data in viral ecology, and build tools to help predict which viruses could infect humans, which animals host them, and where they could someday emerge.
+
+
+[Learn more about the consortium here](https://www.viralemergence.org/)
+
+
+
+
+## VIRION
+
+With over 3 million records, the Global Virome in One Network (VIRION) database is a living encyclopedia of vertebrate viruses - including the ones that pose the greatest threats to human health. Data like these pave the way for a new era of predictive science, and form the backbone for a broader data ecosystem we’re building for animal disease surveillance.
+
+
+
+
+
+## Exploring the Virion data
+
+
+Download the Virion data from the link below:
+
+>  https://github.com/viralemergence/virion/tree/main/Virion
+
+
+There are many different bits of information, including detection information (how was the host-virus association quantified?), taxonomic information on hosts and viruses, and the host-virus association data. Let's load the entire dataset and get a better idea of the scope and nature of the data
+
+> https://github.com/viralemergence/virion/blob/main/Virion/Virion.csv.gz
+
+is where the data lives. It is compressed to avoid file size limitation on GitHub, but can be efficiently read into R using the `vroom` package.
+
+
+
+
+```{r}
+
+install.packages('vroom'), repos='https://cloud.r-project.org')
+library(vroom)
+
+virion <- vroom::vroom('data/Virion.csv.gz')
+
+
+# make an interaction matrix
+virionInt <- table(virion$Host, virion$Virus)
+
+
+dim(virionInt)
+
+# how host-specific are viruses?
+hist(colSums(virionInt>0), 
+  col='dodgerblue', breaks=100, 
+  main='')
+abline(v=mean(colSums(virionInt>0)), lwd=2, col='grey')
+
+# on average, viruses infect around 2 species
+mean(colSums(virionInt>0))
+
+
+# but this one infects over x species
+which.max(colSums(virionInt[,-1] > 0))
+
+```
+
+This is the sort of exploratory data analysis that researchers do to try to understand the data. It can also be used to generate research questions. Why is influenza a virus so common in the data relative to the majority of other pathogens? How do patterns of host-virus associations change across different host groups (i.e., are there some pathogens that only infect certain groups of host species?). Tons of fun questions. Let us now do some string manipulation and continue learning about R. 
+
+
+
+
+
+
+
+
+
+
+
+## String manipulation in base R
+
+First, we can make pull in some characters to manipulate. 
+
+```{r}
+
+vonn <- c('Everything was beautiful and nothing hurt')
+
+# mess with case
+tolower(vonn)
+toupper(vonn)
+
+
+# get the first word in the string
+substr(vonn, 1, 10)
+
+
+# get the last word in the string
+nchar(vonn)
+substr(vonn, nchar(vonn)-3, nchar(vonn))
+
+# ((substring is like substr, but with no end))
+substring(vonn, first=nchar(vonn)-3)
+
+
+# replace single characters 
+chartr('e', 'a', vonn)
+chartr('et', 'ad', vonn)
+
+# replace entire sets of characters
+gsub("Everything", "Nothing", vonn)
+gsub(".", "Nothing", vonn)
+
+
+```
+
+
+
+But this all assumes that we are working with a vector of length 1 basically, right? A lot of times, when we work with characters, we will be working with longer vectors.
+
+
+
+
+```{r}
+
+vonn2 <- strsplit(vonn, ' ')
+
+## what is the structure of vonn2?
+str(vonn2)
+
+vonn2 <- unlist(vonn2)
+
+## but what if we want to paste it back together? 
+paste(vonn2, collapse=' ')
+
+## paste is also really useful for appending or combining character strings with different properties
+
+paste(vonn2, LETTERS[1:length(vonn2)], sep='-')
+
+
+
+## but let's get back to vectors of characters instead of just whole sentences as strings
+vonn2 
+
+## plenty of existing functionality is vectorized to work not just on a single string, but on character vectors
+
+nchar(vonn)
+nchar(vonn2)
+
+tolower(vonn)
+tolower(vonn2)
+
+
+startsWith(vonn2, 'b')
+endsWith(vonn2, 'g')
+
+
+grepl("hurt", vonn2)
+grep("hurt", vonn2)
+
+```
+
+
+
+
+
+
+
+## String manipulation in the tidyverse
+
+
+```{r}
+
+install.packages('stringr'), repos='https://cloud.r-project.org')
+library(stringr)
+
+paste(vonn2, collapse=' ') == stringr::str_c(vonn2, collapse = ' ')
+
+
+substr(vonn2, 1, 3) == stringr::str_sub(vonn2, 1, 3)
+
+str_to_upper(vonn3)==toupper(vonn3)
+
+str_to_upper(vonn3, locale='tr')
+
+str_detect(vonn3, 'hurt') 
+
+str_detect(vonn3, '[0-9]')
+
+str_count(vonn3, 'u')
+
+str_locate(vonn3, 'ur')
+
+str_replace(vonn3, 'Everything', 'nothing')
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### VIRION 
+
+
+How many records exist for host species of the genus 'Abramis'?
+ 
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+How many unique pathogen species in the data have the word 'virus' in them?
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+How many host-virus records are from GenBank? 
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+How many host-virus records have a reference text that is a website?
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+Replace all instances of raccoon (species name is 'procyon lotor') with 'trash panda'.
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+How many times does the character string 'ad' appear in the `VirusFamily` column? 
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+Tie back into plotting. Maybe plot out parasite species richness across host species or something like that if time is available?
+
+```{r}
+
+
+
+```
+
+
+
+
+
+How many host species have more than 3 'e's in them? (easy with tidyverse, more challenging in base)
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

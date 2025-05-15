@@ -1,0 +1,836 @@
+## Phenomenological modeling
+
+We just spent some time going over statistical models. The goal of which was either inference or prediction, but generally took the same form (`y ~ x_1 + x_2 + ...`). 
+
+This is not the only type of model that is of interest to scientists. Models can serve as representations of how a system works, starting from first principles. Let's work through some examples of this. In the process, we will practice our iteration skills (looping/apply/vectorized code). 
+
+
+
+
+
+
+
+
+
+
+
+
+## Population dynamics
+
+Some of the earliest models in ecology were simple representations of species population dynamics. That is, given an initial number of individuals of a species, how will the species abundance change over time. 
+
+
+
+
+
+
+### Exponential growth
+
+```{r}
+
+n0 <- 1:100
+r <- 1
+
+expoGrowth <- function(n, r){
+  n+(n*r)  
+}
+
+
+#effect of growth rate
+plot(n0, expoGrowth(n0, 1.15),
+  type='l', las=1, 
+  xlab='Population size at time t', 
+  ylab='Population size at time t+1', 
+  col='dodgerblue')
+lines(n0, expoGrowth(n0,1),
+  col='firebrick')
+lines(n0, expoGrowth(n0,0.75),
+  col='green')
+abline(a=0,b=1)
+
+legend('bottomright', paste('r', c('1.15', '=1', '=0.75')),
+  pch=16, col=c('dodgerblue', 'firebrick', 'green'), bty='n')
+ 
+
+```
+
+
+
+
+
+
+```{r}
+
+expoDynamics <- function(n,r, steps=100){
+  ret <- c()
+  ret[1] <- n
+  for(i in 1:steps){
+    ret[i+1] <- expoGrowth(ret[i], r)
+  }
+  return(ret)
+}
+
+```
+
+
+
+```{r}
+
+tt  <- 50
+n0 <- 20
+
+#effect of growth rate
+plot(1:(tt+1), expoDynamics(n0, 1.15, steps=tt),
+  type='l', las=1, 
+  xlab='Time', 
+  ylab='Population size', 
+  col='dodgerblue')
+lines(1:(tt+1), expoDynamics(n0, 1, steps=tt),
+  col='firebrick')
+lines(1:(tt+1), expoDynamics(n0, 0, steps=tt),
+  col='green')
+
+legend('topleft', bty='n', 
+  paste('r = ', c('1.15', '1', '0')),
+  pch=16, col=c('dodgerblue', 'firebrick', 'green'))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Logistic growth
+
+```{r}
+
+n0 <- 1:150
+k <- 20
+rr <- 1
+
+
+logisticGrowth <- function(n, r, k){
+  n*exp(r*(1-(n / k)))
+}
+
+
+colz <- c(grey(0.1,0.9), 'dodgerblue', 'firebrick', 'forestgreen')
+#effect of growth rate
+plot(n0, logisticGrowth(n0,1.15,20),
+  type='l', las=1, 
+  xlab='Population size at time t', 
+  ylab='Population size at time t+1', 
+  col=colz[1])
+lines(n0, logisticGrowth(n0,1,20),
+  col=colz[2])
+lines(n0, logisticGrowth(n0,0.75,20),
+  col=colz[3])
+legend('topright', bty='n',
+  c('r=0.75', 'r=1', 'r=1.15'),
+  pch=16, col=colz[c(3,2,1)])
+
+
+
+
+
+#effect of carrying capacity
+plot(n0, logisticGrowth(n0,1, 50),
+  type='l', las=1, ylim=c(0,100),
+  xlab='Population size at time t', 
+  ylab='Population size at time t+1', 
+  col=colz[2])
+lines(n0, logisticGrowth(n0,1,100),
+  col=colz[1])
+lines(n0, logisticGrowth(n0,1,10),
+  col=colz[3])
+legend('topright', bty='n',
+  c('k=10', 'k=50', 'k=100'),
+  pch=16, col=colz[c(3,2,1)])
+
+
+
+
+
+
+
+
+#Look at the peaks of the growth (where is the maximum population size here?)
+
+plotSegs <- function(kx,ky, color){
+  segments(x0=0,x1=kx, y0=ky,y1=ky, col=color, lwd=2, lty=3)
+  segments(x0=kx,x1=kx, y0=0,y1=ky, col=color, lwd=2, lty=3)
+  points(kx,ky, pch=16, cex=2, col=color)
+}
+
+plotSegs(10,10, color=colz[3])
+plotSegs(50,50, color=colz[2])
+plotSegs(100,100, color=colz[1])
+
+
+
+
+
+
+# But why is this? What situations would cause this to not be the case?
+
+plot(n0, logisticGrowth(n0,1.5, 50),
+  type='l', las=1, ylim=c(0,150),
+  xlab='Population size at time t', 
+  ylab='Population size at time t+1', 
+  col=colz[2])
+lines(n0, logisticGrowth(n0,1.5,100),
+  col=colz[1])
+lines(n0, logisticGrowth(n0,1.5,10),
+  col=colz[3])
+legend('topright', bty='n',
+  c('k=10', 'k=50', 'k=100'),
+  pch=16, col=colz[c(3,2,1)])
+
+
+
+#Look at the peaks of the growth (where is the maximum population size here?)
+plotSegs(10,10, color=colz[3])
+plotSegs(50,50, color=colz[2])
+plotSegs(100,100, color=colz[1])
+
+
+
+# this line intersects points where population change from t to t+1 is 0. These are equilibria.
+abline(a=0,b=1)
+
+```
+
+
+
+
+
+
+
+
+
+
+Alright. So now we can look at the actual dynamics across many generations.
+
+```{r}
+
+logisticDynamics <- function(n,r,k, steps=100){
+  ret <- c()
+  ret[1] <- n
+  if(length(r) == 1){
+    r <- rep(r, steps)
+  }
+  for(i in 1:(steps-1)){
+    ret[i+1] <- logisticGrowth(ret[i], r[i], k)
+  }
+  return(ret)
+}
+
+```
+
+
+
+
+
+
+```{r}
+
+stps <- 20
+
+plot(1:stps,
+ logisticDynamics(n=20, r=1, k=30, steps=stps),
+  type='l', las=1, ylim=c(0,50),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+#sapply(seq(1,25,by=1), function(x){
+# lines(logisticDynamics(n=x, r=1, k=30, steps=stps), col='firebrick')
+#})
+
+
+sapply(seq(35,50,by=1), function(x){
+ lines(logisticDynamics(n=x, r=1, k=30, steps=stps), col='dodgerblue')
+})
+
+sapply(seq(5,30,by=1), function(x){
+ lines(logisticDynamics(n=x, r=rep(c(0.5,1.5),5), k=30, steps=stps), col='firebrick')
+})
+
+```
+
+
+
+
+
+
+
+
+
+
+What if growth rate is not 1?
+
+r = 0
+
+
+```{r}
+
+stps <- 20
+
+plot(1:stps,
+ logisticDynamics(n=30, r=0, k=30, steps=stps),
+  type='l', las=1,ylim=c(0,100),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+sapply(seq(1,25,by=1), function(x){
+ lines(logisticDynamics(n=x, r=0, k=30, steps=stps), col='firebrick')
+})
+
+sapply(seq(35,100,by=5), function(x){
+ lines(logisticDynamics(n=x, r=0, k=30, steps=stps), col='dodgerblue')
+})
+
+```
+
+
+
+
+
+
+
+r = 1.5
+
+```{r}
+
+stps <- 20
+
+plot(1:stps,
+ logisticDynamics(n=29, r=1.5, k=30, steps=stps),
+  type='l', las=1,ylim=c(0,100),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+sapply(seq(1,25,by=1), function(x){
+ lines(logisticDynamics(n=x, r=1.5, k=30, steps=stps), col='firebrick')
+})
+
+sapply(seq(35,100,by=5), function(x){
+ lines(logisticDynamics(n=x, r=1.5, k=30, steps=stps), col='dodgerblue')
+})
+
+```
+
+
+
+
+
+
+
+r = 2
+
+```{r}
+
+stps <- 50
+
+plot(1:stps,
+ logisticDynamics(n=30, r=2, k=30, steps=stps),
+  type='l', las=1,ylim=c(0,100),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+plot(1:stps,
+ logisticDynamics(n=29, r=2, k=30, steps=stps),
+  type='l', las=1,ylim=c(0,100),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+sapply(seq(1,25,by=1), function(x){
+ lines(logisticDynamics(n=x, r=2, k=30, steps=stps), col='firebrick')
+})
+
+sapply(seq(35,100,by=5), function(x){
+ lines(logisticDynamics(n=x, r=2, k=30, steps=stps), col='dodgerblue')
+})
+
+
+```
+
+
+
+
+
+(between 3 and 3.449 -- oscillates between 2 values)
+
+r = 3.2
+
+```{r}
+
+stps <- 20
+
+plot(1:stps,
+ logisticDynamics(n=20, r=3.2, k=30, steps=stps),
+  type='l', las=1,ylim=c(0,100),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+sapply(seq(1,100,by=5), function(x){
+ lines(logisticDynamics(n=x, r=3.2, k=30, steps=stps), col='firebrick')
+})
+
+```
+
+
+
+
+
+
+
+
+
+(onset of chaos)
+r > 3.56
+
+```{r}
+
+stps <- 100
+
+plot(1:stps,
+ logisticDynamics(n=30, r=4.75, k=30, steps=stps),
+  type='l', las=1,ylim=c(0,150),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+
+plot(1:stps,
+ logisticDynamics(n=29, r=4.75, k=30, steps=stps),
+  type='l', las=1,ylim=c(0,150),
+  xlab='Time', 
+  ylab='Population size', 
+  col=1)
+
+```
+
+
+
+
+
+This is one example, and a deterministic one. That is, all the resulting dynamics that we simulate would not change if they were re-run. This is not the case for many things. For instance, when we were training certain statistical models (e.g., boosted regression trees with `gbm`), the results would differ slightly if we were to re-train the model. This is due to how the model works (tree-based model with many weak learning trees, for one). We'll go over why this matters more in the lecture on probabilistic processes, where we will start to study probability distributions in R. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+## Structuring your repository
+
+### README file
+
+A README file is a user-facing file which should detail what your repo is for and how to use it (e.g., reproduce an analysis from data to figures and results). It is normally a .txt or .md extension, meaning it is plain text (.txt) or markdown (.md). README files have been around for well over 50 years, and are essential in designing your workflow. The README should contain the following information:
+
++ **Name**: the name of the project and the names of the contributors (or at least the main author) 
++ **Background/summary**: what is your project for. In the context of science, you would highlight your main research question
++ **Prerequisites**: things necessary for the code to run effectively. Even if you were to write R code that was entirely reproducible, you are assuming that the user has R installed. Information on necessary programs, libraries, etc. should be listed
++ **Installation**: what commands need to be run to reproduce the analyses? This is a description of how to understand the structure of the repo and how to actually reproduce (or install) the analyses.
++ **Contributors**: Credit existing contributors and state any conflict of interests. 
++ **Acknowledgments**: Acknowledge financial support or help from organizations 
++ **Code of conduct**: A clear statement describing acceptable behavior of contributors as they interact. This is important for larger, public-facing products, as it sets up the expectations of community members in terms of standards (e.g., use of inclusive language) and things that are entirely unacceptable (e.g., sexualized language, trolling, political attacks, etc.)
++ **License info**: Describe what license the code is released under. That is, you are the owner of your intellectual property, and that gives you the right to license it in different ways. 
+
+
+
+
+
+
+### LICENSE
+The license file contains the license under which you would like to develop and distribute your science under. In traditional copyright, you maintain all rights to your intellectual property (except that sweet gif you made using footage from the last LSU Tigers football game, as they retain the copyright for the original material). Copyrights are often prohibitively strict in their interpretation, and are almost entirely ignored since the development of the internet. But we still need a way to get credit for our work. _Open source licenses_ allow us to do this in a flexible way. In essence, open source licenses are approved by the Open Source Initiative, and spell out the conditions for the re-use of the product. It is an important distinction, as copyright protects all rights (the default is closed), while open source licenses have things added to them to make them less open (the default is open). 
+
+
+There are a number of open source licenses. For the sake of this course, we will focus only on those in the Creative Commons (https://creativecommons.org/licenses/). The most liberal Creative Commons (CC for short) license is CC0, which waives all rights and places the work in the public domain (anyone can remix, reuse, profit, share, etc. your product). After this, there are variations that modify this open base. The first modification is concerning attribution. 
+
+
+**BY**: BY stands for "by attribution", meaning that you can use freely use, distribute, and profit from the product, but you have to acknowledge the source of the product. 
+
+The other licenses are variants on this license, as attribution is a fairly non-restrictive bar. The other restrictions include:
+
+
+
+
++ **SA**: Standing for "share-alike", this modification means that you can build on the existing work, and use it for profit, but you will have to adopt this same license. This is often referred to as a "parasitic" license, since it sort of requires that the person using the licensed product has to license their product in a certain way (i.e., they have to have a CC license). 
+
++ **ND**: Standing for "no derivatives", this modification means that others can freely use the existing work, but cannot modify, transform, or build upon the original product. This is most useful for situations where you want to share your product, but you do not want the content of copies to change across projects. For instance, an internet security company may make a security product, but place this limitation on it so they know that others are building on their existing codebase and not modifying it or degrading it (e.g., for purposes of hacking rather than information security). 
+
++ **NC**: Standing for "non-commericial", this modification means that you cannot use the product for commercial gain. This would especially useful for photographers that produce striking images, which people may want to print and sell. This makes sure that if people print the photos, they cannot profit from it. 
+
+The end product is a basic license (either "CC0" or "CC BY") with some extra letters defining the scope of the license (e.g., "CC BY NC" stands for 'by attribution' and 'non-commercial', so you have to attribute the source of the material and cannot use it for commercial purposes). Now that you know about Creative Commons, you will likely see these everywhere. 
+
+
+
+
+
+
+### .gitignore
+
+The .gitignore file is a plain text file that you contains paths to files you wish to not version-control. For instance, I version control my lectures and exams for "Principles of Ecology", but I develop it in a private repo and have the answer keys to exams in my .gitignore, so that I do not version the answer key (just in case). This is also useful for dealing with large files, as Github can only accept files that are less than 100 Mb. This will not automatically be created when you initialize a git repo, so you will have to use your command line skills to create the file (i.e., `touch .gitignore` to create the file; `nano`, `vim`, `emacs`, `gedit` or the like to edit it). Files beginning with a "." are normally not even shown in file managers, but you can see them by hitting "Ctrl + h" (in Ubuntu). 
+
+
+
+
+
+### Data
+
+Data is typically a folder containing the assorted data used in the analyses. For the sake of this course, there are two types of data. 
+
++ **Raw data**: These files are never changed. Treat them like they are protected files. Scripts that process raw data into the form used in the analyses are placed in the "Analysis" folder. Raw data are not edited directly.
+
++ **Processed data**: These files are outputs from the initial pre-processing scripts. These files are what your analyses and plots will use. Treat them like they are wrong and may change. If it is not too time-intensive to re-process your raw data, do it on occasion to ensure that nothing changes in your processed data. 
+
+
+
+
+
+
+
+
+### Analysis
+
+This folder contains your analytical scripts. For the sake of this class, we will assume that these are `R` or `R markdown` scripts. This code can output figures directly into this directory, or can create a "figures" directory and output there. However, it is best practice to not have your code create directories (easier to break). 
+
+It is incredibly important here to use relative paths. It is not uncommon when you see code that has calls like `read.csv('/home/user/myProject/Data/myData.csv')`. This is bad practice, because it assumes I have a home folder, a user folder, and the entire directory structure as the user did. For many, the path I used above will almost never be the case, as it is more typical in the linux OS. For Windows users, it would be something like 'C:/My Documents/Data.csv'. 
+
+
+> Another side 'best practice' point: file names should not have spaces. Spaces are evil, and should be avoided at all costs. 
+
+
+
+### Manuscript 
+
+This folder contains all the files associated with your manuscript or project write-up (if it has one). I like to separate my manuscript writing from my analysis files, but like to have this as the same set of files. I find that when dealing with large data or complex simulation exercises, it is just not worth it to re-build the analysis each time I want to see the manuscript output. There are ways around this, but they are largely hacky. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## unit testing, make, and continuous integration
+
+Test your code. Allows for dynamic reports, where the source data can be dynamically updated (e.g., if you were doing COVID-19 analysis, your code would certainly benefit from being able to pull the latest case counts, no?). We'll go over three different things that can help with report generation and automation. 
+
+
+
+
+
+
+
+### unit testing 
+
+We do unit testing as we write code often, in a very ad hoc way. That is, we run a chunk of code on subset or artificial data, to make sure the code is doing what we want it to do. This concept underlies the idea of unit testing as we will learn it. Here, we write a set of functions to perform an analysis. We know the output of these functions in terms of their class, data structure (shape, size, etc.), and sometimes some summary statistics on them. What we want to do is to design an automated way to make sure the functions are outputting reasonable output compared to what we would expect. 
+
+This is perhaps most useful to `R` packages, as small changes in one part of the package may break something in a different function. This would not be apparent to the package maintainer, but if automated tests were in place, the developer could be alerted. 
+
+
+> As a side note: this is how your homework is automatically graded -- as we have touched on briefly -- thanks to continuous integration and Travis CI, which runs the unit tests each time you make a push to Github with edits to your homework. 
+
+
+For this, we will have to extend beyond base `R`, using the `testthat` package. This package, and the general idea behind testing, is laid out in detail in http://rjournal.github.io/archive/2011-1/RJournal_2011-1.pdf#page=5 (the article that we read for class). 
+
+The way the `testthat` package recommends organizing tests is to have a `tests` folder in your analysis directory, which contains a file `testthat.R` and a folder containing `R` scripts of individual tests. Each test in the `tests` folder is an `R` script which is composed of multiple `expectations`. Below is an example.
+
+
+```{r}
+
+testthat::context("your analysis")
+
+testthat::test_that("isRed function does stuff", {
+	testthat::expect_output(isRed('orange'), 'maybe?')
+	testthat::expect_type(isRed('clown nose'), 'character')
+	testthat::expect_equal(length(isRed('orange')), 1)
+})
+
+```
+
+
+We see three things. First, we define a `context` which allows the grouping of multiple tests. Then we define the test (`test_that`) which wraps all the `expectations` inside a single function. If tests are met, there is no output. We can see this by breaking the test condition.
+
+```{r eval=FALSE}
+
+testthat::expect_type(isRed('clown nose'), 'numeric')
+
+```
+
+Which errors out with the error 
+
+> Error: isRed("clown nose") has type `character`, not `numeric`.
+
+
+
+
+By issuing `testthat::test_dir()`, we can run all the tests contained in a given directory
+
+
+
+#### Other useful testing functions
+
+```{r eval=FALSE}
+expect_null()
+expect_true()
+expect_success()
+expect_more_than()
+expect_identical()
+expect_equal()
+expect_error()
+expect_warning()
+
+```
+
+
+
+Hadley mentions in his 2011 article (http://rjournal.github.io/archive/2011-1/RJournal_2011-1.pdf#page=5) the need for the incorporation of code coverage. The idea is that we can test code, but we may also want to know which functions or parts of our code are lacking appropriate testing. Code coverage basically tells you the fraction of your code that is covered by tests, and points to functions or areas which could be improved. We will not go into this in any more depth in this course. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### GNU make
+
+Makefiles are incredibly useful, and fairly simple to write. We will not go into too much detail on them, but they are essentially recipes that can be used to build your analytical pipeline and reproduce your analyses by issuing one simple command (`make`) from the command line. The makefile is named "Makefile" and is placed in the repository you wish to act on (typically) but can also exist at a higher-level.
+
+
+
+```{r, eval=FALSE}
+
+TEXFILE = manuscript
+
+paper:
+	xelatex $(TEXFILE).tex
+	bibtex *.aux
+	xelatex $(TEXFILE).tex
+	xelatex $(TEXFILE).tex
+	rm -fv *.aux *.log *.toc *.blg *.bbl *.synctex.gz
+	rm -fv *.out *.bcf *blx.bib *.run.xml
+	rm -fv *.fdb_latexmk *.fls
+
+view:
+	evince $(TEXFILE).pdf &
+
+clean:
+	rm -fv *.aux *.log *.toc *.blg *.bbl *.synctex.gz
+	rm -fv *.out *.bcf *blx.bib *.run.xml
+	rm -fv *.fdb_latexmk *.fls
+	rm -fv *.pdf
+
+```
+
+This makefile is used to compile a manuscript written in latex. The file is named 'manuscript'. The default is the first bit (`paper`). When I want to run it, I issue the command `make paper` from the terminal when my working directory is where the makefile is. This issues terminal commands that run `xelatex` and `bibtex` to compile my manuscript into pdf, and then remove `rm` a bunch of unncessary files to keep my directory tidy. If I wanted simply to clean a repo of these files without re-compiling the manuscript, I could use `make clean`. 
+
+
+
+`R` scripts can be run from the command line using the `Rscript` or `R -e ` flags. This means that your makefile could be used to compile all your analyses, without the end user needing to know how to compile your code...meaning that they would not have to know `R` or `R markdown`, but they would need to have `make` installed and know how to use that. This means this is not a silver bullet for reproducibility, but it will save you some time and help keep your analytical pipeline clean and structured.
+
+
+
+```{r, eval=FALSE}
+
+analysis:
+  Rscript analysis.R
+
+view:
+	evince $(TEXFILE).pdf &
+
+clean:
+	rm -fv *.aux *.log *.toc *.blg *.bbl *.synctex.gz
+	rm -fv *.out *.bcf *blx.bib *.run.xml
+	rm -fv *.fdb_latexmk *.fls
+	rm -fv *.pdf
+
+```
+
+or we could use wildcards to source all R scripts within the directory
+
+
+
+
+
+
+
+
+apt -y update
+apt -y install nano
+
+
+
+
+
+
+
+
+
+```{r, eval=FALSE}
+
+R_FILES=$(wildcard *.R)
+
+analysis:
+  R CMD BATCH $(R_FILES)
+
+view:
+	evince $(TEXFILE).pdf &
+
+clean:
+	rm -fv *.aux *.log *.toc *.blg *.bbl *.synctex.gz
+	rm -fv *.out *.bcf *blx.bib *.run.xml
+	rm -fv *.fdb_latexmk *.fls
+	rm -fv *.pdf
+
+```
+
+For more information on how to structure Makefiles, see:
+
++ http://webcache.googleusercontent.com/search?q=cache:http://kbroman.org/minimal_make/
++ https://monashbioinformaticsplatform.github.io/2017-11-16-open-science-training/topics/automation.html
++ https://www.r-bloggers.com/2015/03/makefiles-and-rmarkdown/
+
+There is also an R package called `rmake` and another called `easyMake`, but I fail to see the point in it. Leave R in order to do the thing, right?  
+
+
+
+
+
+
+
+
+
+
+
+
+
+### continuous integration
+
+GitHub actions is how I will introduce this, for a couple of reasons. First, we have gone over GitHub and git, and hopefully you are starting to be more familiar with it. Second, the learning curve is slightly lower, for a number of reasons. First, working within a familiar framework (within your git repo) is easier than using a secondary service. Second, there is an ecosystem of basically pre-written GitHub Actions, and the community is pretty good about documentation and such (this is not to say that Circle CI does not have well-written documentation, which they certainly do). 
+
+[a primer on GitHub Action](https://docs.github.com/en/actions/quickstart)
+[a bit more info on terminology](https://gabrieltanner.org/blog/an-introduction-to-github-actions)
+[specific to some R workflows](https://orchid00.github.io/actions_sandbox/)
+
+
+Let's build on the previous case of the Makefile, as we can re-run the make template as a GitHub Action. This basically means that each time you push (or perform a relevant action which you define), the makefile is run and the project is re-created. 
+
+
+```
+   name: analysis
+
+   on:
+     push:
+       branches: [ master ]
+     pull_request:
+       branches: [ master ]
+
+   jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: build application
+        run: make 
+
+```
+
+
+
+
+
+This is a flexible and extensible framework, which we will (likely) not have time to delve into. One thing that is super useful is that you can schedule GitHub Actions to run as a function of time, not due to an event (e.g., a push). 
+
+
+```
+on:
+  schedule:
+  - cron: "0 2 * * MON-FRI" # Runs at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  ...
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -201,15 +201,36 @@ And now we have a Fibonacci sequence starting with `c(0,1)`.
 `apply` statements exist in many types, depending on the data.structure you wish to do the action on: e.g. `apply`, `sapply`, `lapply`, `vapply`, `tapply`. We will focus on `apply` and `lapply`, but realize that these other options may be better suited for your use case (especially `vapply`, which gives you a bit more control over output format). In the loop above, we wanted to find the mean of each entry in a list. We used a `for` loop to loop over elements, and stored the resulting means in a vector called `out`. Instead, we could use `lapply`...the `l` in it means it performs some action on a list object. 
 
 
+
+
+We will use biological data on ringtail poop sampled between 2020 and 2022 in Zion National Park and Grand Canyon National Park by Anna Willoughby. More information on the goals of the project are available here (https://github.com/DrakeLab/willoughby-ringtail-fieldwork). 
+
+
+
 ```{r}
-lapply(X=testList2, FUN=mean)
+
+dat2 <- read.csv("https://raw.githubusercontent.com/DrakeLab/willoughby-ringtail-fieldwork/refs/heads/master/data/ZNP-2019_Fecal_Fragments.csv")
+
+dat2 <- dat2[,1:10 ]
+
+testList2 <- split(dat2, dat2$FragmentType)
+
+```
+
+The `split` function takes a data.frame and splits it into a list of data.frames, where each data.frame is a subset of the original data.frame. The `lapply` function takes a list and applies a function to each element in the list.
+
+
+```{r}
+
+lapply(X=testList2, FUN=nrow)
+
 ```
 
 The output of `lapply` will always be a list, which is nice in some instances and not nice in others. `sapply` is a wrapper for `lapply` which always returns a vector of values.
 
 
 ```{r}
-sapply(X=testList2, FUN=mean)
+sapply(X=testList2, FUN=nrow)
 ```
 
 
@@ -251,6 +272,34 @@ One advantage is that indexing rows of a data.frame is a pain, which is why we h
 lapply(X=testDF, FUN=mean)
 sapply(X=testDF, FUN=mean)
 ```
+
+
+
+## Some practice problems 
+
+1. Above, we defined a data set as a list on ringtail diet changes as a function of time. Using those data, calculate the mean dry fragment weight for each of the fragment types.
+
+```{r}
+
+
+```
+
+
+
+
+
+
+2. The data are divided out into `Segment`s and `Fragment`s, where `Segment`s are composed on smaller fragments of different types. Using what you know (either for loop or apply style statements), calculate the fraction of `Anthropogenic` fragments (`Anthropogenic` is a `FragmentType`) in each `Segment`.
+
+```{r}
+
+
+```
+
+
+
+
+
 
 
 
@@ -374,24 +423,6 @@ for(i in 1:length(strat)){
 
 ```
 
-
-
-
-
-
-How would you modify your strategy to be adaptive? For instance, if your opponent selects 'rock' twice in a row, it may be unlikely that they'll select 'rock' again. How do you incorporate this into the code? 
-
-```{r}
-tadStrat2 <- function(opp){
-  distro <- table(opp)
-  probz <- distro / sum(distro)
-  strat <- sample(c('rock', 'paper', 'scissors'), 
-    length(opp), replace=TRUE, prob=probz[c(3,1,2)])
-  return(strat)
-}
-
-
-```
 
 
 

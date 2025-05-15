@@ -1,0 +1,82 @@
+### Reading for this week:
+> 
+
+
+
+
+
+
+
+
+## Why is data visualization important?
+
+exploratory data analysis
+
+clear demonstration of results relative to tables or statistics
+
+pretty
+
+
+
+
+
+
+
+
+
+## setting up the plotting window
+
+```{r}
+
+par(mar=c())
+
+```
+
+
+
+
+## histograms
+
+frequency data
+
+
+
+
+
+## barplot 
+
+continuous and categorical mix 
+
+
+
+
+
+## scatterplots
+
+continuous data
+
+
+
+
+
+
+
+### layering data (an example)
+
+```{r}
+
+plot(1:10, 1:10)
+points()
+lines()
+legend()
+title()
+
+```
+
+
+
+
+
+
+
+

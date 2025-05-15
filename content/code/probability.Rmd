@@ -35,6 +35,8 @@ sum(coin == 1)
 
 ```
 
+
+
 As a biological example, consider an animal who disperses with some probability $p$, and moves a distance determined by a Poisson distribution with mean 10km. How do we code this up? 
 
 ```{r}
@@ -55,6 +57,8 @@ But the above incorporation of probabilistic processes is based on phenomenologi
 “p” 	returns the cumulative density function
 “q” 	returns the inverse cumulative density function (quantiles)
 “r” 	returns randomly generated numbers
+
+
 
 ### Generate random draws from probability distributions
 
@@ -222,7 +226,9 @@ abline(v=tt, lwd=3)
 
 \[ \dfrac{X1-X2}{sp} \]
 
+
 \[ sp = \dfrac{\sqrt{varx1  + varx2}}{2} \]
+
 
 where `sp` is pooled variance
 

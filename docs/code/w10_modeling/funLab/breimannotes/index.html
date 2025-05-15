@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+  <meta name="generator" content="Hugo 0.68.3" />                                                                   
+               
+    
+  <title>Reproducible Research in R</title>
+	<link rel="apple-touch-icon" sizes="76x76" href="img/apple-icon.png">
+	<link rel="icon" type="image/png" href="../../../../img/favicon.png">
+	
+	
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+  <link rel="stylesheet" href="https://cdn.rawgit.com/gaborcsardi/r-font/master/rlogo.css">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/wesbos/Font-Awesome-Docker-Icon/master/fontcustom/fontcustom.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css">
+
+	
+  <link href="../../../../css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../../../../css/material-kit.css" rel="stylesheet"/>
+  
+  
+
+  
+    
+  <link rel="alternate" href="../../../../index.xml" type="application/rss+xml" title="Reproducible Research in R">
+  <link rel="feed" href="../../../../index.xml" type="application/rss+xml" title="Reproducible Research in R">
+  <link rel="canonical" href="../../../../code/w10_modeling/funlab/breimannotes/">
+</head>
+
+  
+<body class="profile-page">
+  	<nav class="navbar navbar-transparent navbar-fixed-top navbar-color-on-scroll">
+	    	<div class="container">
+        	
+        	<div class="navbar-header">
+        		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example">
+            		<span class="sr-only">Toggle navigation</span>
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+        		</button>
+        		<a class="navbar-brand" href="../../../../">Reproducible Research in R</a>
+        	</div>
+
+        	<div class="collapse navbar-collapse" id="navigation-example">
+        		<ul class="nav navbar-nav navbar-right">
+      
+        
+
+        <li class="nav-item">
+          <a href="../../../../">
+            <i class='sidebar-button-icon fa fa-lg fa-home'></i>
+            <span>Home</span>
+          </a>
+        </li>
+        
+      
+        
+
+        <li class="nav-item">
+          <a href="../../../../modules">
+            <i class='material-icons'>dashboard</i>
+            <span>Modules</span>
+          </a>
+        </li>
+        
+      
+        
+
+        <li class="nav-item">
+          <a href="../../../../tutorials">
+            <i class='material-icons'>build</i>
+            <span>Tutorials</span>
+          </a>
+        </li>
+        
+      
+        
+
+        <li class="nav-item">
+          <a href="../../../../syllabus">
+            <i class='material-icons'>date_range</i>
+            <span>Syllabus</span>
+          </a>
+        </li>
+        
+      
+        
+
+        <li class="nav-item">
+          <a href="../../../../policies">
+            <i class='material-icons'>gavel</i>
+            <span>Policies</span>
+          </a>
+        </li>
+        
+      
+        		</ul>
+        	</div>
+    	</div>
+    </nav>
+  <div class="wrapper">
+    <div class="header header-filter" style="background-image: url('https://www.scienceintheclassroom.org/sites/default/files/styles/open_graph/public/magazine-images/06_Seeing-the-forest-for-the-trees.jpg?itok=ArG80Ken');">
+    </div>
+		<div class="main main-raised">
+			<div class="container">
+		  	<div class="section text-left">
+		  	  <h2 class="title text-center"></h2>
+		  	  <div class="row">
+		  	    <div class="col-md-6 col-md-offset-3" id="content">  
+	            <h3 id="breiman-two-cultures">Breiman &lsquo;two cultures&rsquo;</h3>
+<p><code>Prediction</code> To be able to predict what the responses are going to be to future input variables;</p>
+<blockquote>
+<p>Algorithmic modeling culture: the shape of that function(x) of the predictor variables is unknown, and we shouldn&rsquo;t specify a form. Focus is on model validation by predictive accuracy.</p>
+</blockquote>
+<p><code>Information</code> To extract some information about how nature is associating the response variables to the input variables</p>
+<blockquote>
+<p>Data modeling culture: values of parameters are estimated from data, assuming that there is some known function that links predictor and responses, where information is the main goal.</p>
+</blockquote>
+<ol>
+<li>Focus on finding a good solution-that&rsquo;s what consultants get paid for.</li>
+<li>Live with the data before you plunge into modeling.</li>
+<li>Search for a model that gives a good solution, either algorithmic or data.</li>
+<li>Predictive accuracy on test sets is the criterion for how good the model is.</li>
+<li>Computers are an indispensable partner.</li>
+</ol>
+<p>Rashomon: the multiplicity of good models;
+Occam: the conflict between simplicity and accuracy;
+Bellman: dimensionality-curse or blessing</p>
+<h4 id="questions-for-discussion">Questions for discussion:</h4>
+<p>What are the two cultures of statistical modeling?</p>
+<p>(data modeling and algorithmic modeling)</p>
+<p>What role do you think consulting had in changing Breiman&rsquo;s view of statistical modeling? How did the consulting problems fundamentally differ from typical academic problems?</p>
+<p>(ozone example, the focus was inherently on prediction (nearly real-time) and the feature set was huge; most of the projects listed on page 200 deal with predictive modeling and not inference)</p>
+<p>What are the benefits of having an explicit data model (i.e., assuming that the data are generated according to some pre-set model)?</p>
+<p>What issues are discussed in the context of the linear regression example in 5.1, and more generally in section 5?</p>
+<p>What are some limitations of data models, and how have the lines been a bit blurred in more recent years?</p>
+<p>If Breiman were to re-write section 7.1 of this paper, what do you think would be the same/different?</p>
+<p>(deep learning and the huge advent of statistical learning would definitely be discussed at length)</p>
+<p>How does Breiman define model &ldquo;instability&rdquo; and the multiplicity problem? Have you encountered something similar to this yet? What is Breiman&rsquo;s proposal for one solution to this problem?</p>
+<p>(model error is same but variable sets and model structure can be quite different. Selecting only the most relevant predictors necessitates that such a clean subset exist, which is rarely the case. Bagged trees and algorithmic approaches which can account for an expanded number of covariates can be stable and yield good performance. This can also exist in a data modeling approach though too, which blurs the lines, as L1/regularized regression is essentially a data-modeling way to still assume a functional form, but to allow coefficients to shrink to 0 effect. )</p>
+<p>What is the conflict between prediction, accuracy, and simplicity that Breiman discusses in reference to Occam&rsquo;s razor/dilemma?</p>
+<p>(Accuracy generally requires more complex prediction methods. Simple and interpretable functions do not make the most accurate predictor)</p>
+<p>What is the curse of dimensionality? Why is it maybe not so much a curse? When is it not so much a curse?</p>
+<p>(a side note: the NIST dataset still exists and the challenge is still a useful one for exploring how to classify simple images. <a href="https://www.kaggle.com/c/digit-recognizer">https://www.kaggle.com/c/digit-recognizer</a>)</p>
+<p>In section 11, Breiman gives a neat example about variable importance and model selection. What are the differences in approach from the logistic regression and variable importance estimation relative to the random forest and variable importance estimation procedure there?</p>
+<p>(logistic regression followed by bootstrapped model fits found top n variables in the best fit model were only in the submodels like 60% of the time. Random forest found a consistent effect of two variables, both of which were collinear and explained pretty much the same proportion of variance in the test set.)</p>
+<p>How do we assess model performance generally?</p>
+<p>(R2, p-values, predictive accuracy. be sure to mention train/test split and the issue of class imbalance).</p>
+<p>What were your major takeaways from this paper?</p>
+
+	          </div>
+          </div> 
+        </div>
+      </div>
+		</div>
+    <footer class="footer">
+  <div class="container">
+	  <nav class="pull-left">
+	    <ul>
+	    
+        
+
+        <li>
+          <a href="https://github.com/BiolDataScience"><i class='button-icon fa fa-2x fa-github'></i> Github</a>
+        </li>
+        
+      
+        
+
+        <li>
+          <a href="http://r4ds.had.co.nz/"><i class='material-icons'>book</i> Textbook</a>
+        </li>
+        
+      
+      </ul>
+    </nav>
+	  <div class="copyright pull-right">
+	    <img src="../../../../img/cc-by.svg"/>
+	  </div>
+  </div>
+</footer>
+	</div>
+</body>
+
+   
+  
+  
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	
+	
+	
+	<script src="../../../../js/material.min.js"></script>
+
+	
+	<script src="../../../../js/nouislider.min.js" type="text/javascript"></script>
+	
+	<script src="../../../../js/bootstrap-datepicker.js" type="text/javascript"></script>
+
+	
+	<script src="../../../../js/material-kit.js" type="text/javascript"></script>
+
+   
+    
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']] } });
+    </script>
+    <script async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML"></script>
+    
+
+</html>

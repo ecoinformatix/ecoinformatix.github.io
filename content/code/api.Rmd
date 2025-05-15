@@ -5,19 +5,6 @@ date:
 output: pdf_document
 ---
 
-### Reading for this week:
-
-Two this week
-
-> https://medium.com/@traffordDataLab/querying-apis-in-r-39029b73d5f1
-
-> https://www.interaction-design.org/literature/article/guidelines-for-good-visual-information-representations
-
-
-
-
-
-
 
 ## What's the point of APIs?
 
@@ -115,7 +102,7 @@ This apply statement gets information on the title of each of the works returned
 
 ```{r}
 
-vonTitle0 <- sapply(vonInfo[[4]], function(x){
+vonTitle0 <- sapply(vonInfo[[8]], function(x){
   x$title
 })
 
@@ -153,7 +140,7 @@ This is better, as it now provides information on books where Vonnegut was liste
 
 ```{r}
 
-vonTitle <- sapply(vonInfo2[[4]], function(x){
+vonTitle <- sapply(vonInfo2[[8]], function(x){
   x$title
 })
 
@@ -164,7 +151,7 @@ vonTitle <- sapply(vonInfo2[[4]], function(x){
 
 
 
-> Side fun note: You can access Github info through API calls as well
+> Side fun note: You can access GitHub info through API calls as well
 
 ```{r}
 
@@ -174,6 +161,19 @@ tadInfo <- jsonlite::fromJSON(content(tad, "text"), simplifyVector = FALSE)
 ```
 
 
+
+
+
+
+### Class problem:
+
+How long as Tad been on GitHub?
+
+
+```{r}
+
+
+```
 
 
 
@@ -261,7 +261,68 @@ points(giraffe2$decimalLongitude, giraffe2$decimalLatitude, pch=16,
 ```
 
 
-Giraffes are in the US!!! These are almost certainly zoo records. 
+Giraffes are in the US!!! It is important to clean your data, as these are 100% zoo records. 
+
+
+
+
+
+### A fun aside on spatial data in R 
+
+A fairly consistent ask of researchers who use `R` is how to make pretty maps. There are a number of different `R` packages which can help you work with spatial data, and a full exploration of these packages is outside the scope of this course. However, I will point you to a few resources that I have found useful.
+
++ [R-spatial](https://r-spatial.github.io/)
++ [R spatial task view](https://cran.r-project.org/web/views/Spatial.html)
++ [R-spatial book](https://geocompx.github.io/geocompkg/)
+
+
+For visualizing spatial boundaries, I have found the `maps` package to be the most useful, though the `geodata` package also has world boundaries at different 'resolutions' or levels of detail. A short time ago, the main `R` packages for spatial data were `raster` and `sp`, both have largely been refined and replaced by `terra` and `sf`, respectively (same maintainers for the most part as well). 
+
+
+
+```{r}
+
+library(sf)
+giraffe2 <- giraffe2 %>%
+  dplyr::select(decimalLongitude, decimalLatitude) %>%
+  dplyr::filter(!is.na(decimalLongitude), !is.na(decimalLatitude))
+
+pts <- sf::st_as_sf(giraffe2, coords = c("decimalLongitude", "decimalLatitude"), 
+  agr = "constant")
+
+maps::map()
+plot(pts, add = TRUE, pch = 16, col = grey(0.1,0.5))
+
+```
+
+
+Above is a good example of how to convert points from a data.frame into a spatial object that `sf` can work with (it needs information on things like projection and other metadata). Now let's go into another spatial data type, the raster, and how we can use point data alongside raster data. 
+
+
+
+```{r}
+
+library(terra)
+library(geodata)
+
+bc <- geodata::cmip6_world("CNRM-CM6-1", "585", "2061-2080", var="bioc", res=10, path=tempdir())
+
+plot(bc[[1]])
+plot(pts, add = TRUE, pch = 16, col = grey(0.1,0.5))
+
+```
+
+
+And to get the values of the raster at the points we have, we can use the `extract` function from `terra`. The `extract` function will take the values from the raster at the points you provide, and return a data.frame with the values.
+
+
+```{r}
+
+giraffeTemp <- terra::extract(bc[[1]], pts)
+hist(giraffeTemp$bio01)
+
+```
+
 
 
 
@@ -429,7 +490,7 @@ head(surveys3)
 
 This difference becomes clear when we try to index a specific column of data and work with it. 
 
-```{r}
+```{r, eval=FALSE}
 
 surveys2$sex
 surveys3$sex
